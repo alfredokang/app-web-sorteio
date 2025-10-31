@@ -14,6 +14,10 @@ interface Carousel3DProps {
 const TOTAL_ROTATIONS = 8;
 const MAX_VISIBLE_CARDS = 8;
 
+function normalizeAngle(angle: number) {
+  return ((angle + 540) % 360) - 180;
+}
+
 export function Carousel3D({
   participants,
   isSpinning,
@@ -25,55 +29,50 @@ export function Carousel3D({
   const startTimestamp = useRef<number | null>(null);
   const alignmentRef = useRef<number | null>(null);
 
-  const anglePerCard = useMemo(() => {
-    return participants.length > 0 ? 360 / participants.length : 0;
+  const visibleSlots = useMemo(() => {
+    if (participants.length === 0) {
+      return 0;
+    }
+
+    return Math.min(participants.length, MAX_VISIBLE_CARDS);
   }, [participants.length]);
 
-  const visibleItems = useMemo(() => {
+  const angleBetweenCards = useMemo(() => {
     if (participants.length === 0) {
+      return 0;
+    }
+
+    const slots = visibleSlots || 1;
+    return 360 / slots;
+  }, [participants.length, visibleSlots]);
+
+  const visibleItems = useMemo(() => {
+    if (participants.length === 0 || visibleSlots === 0 || angleBetweenCards === 0) {
       return [];
     }
 
-    const maxVisible = Math.min(participants.length, MAX_VISIBLE_CARDS);
+    const frontIndexFloat = -rotation / angleBetweenCards;
+    const frontIndex = Number.isFinite(frontIndexFloat)
+      ? Math.round(frontIndexFloat)
+      : 0;
+    const frontSlot = ((frontIndex % visibleSlots) + visibleSlots) % visibleSlots;
+    const baseSlot = frontIndex - frontSlot;
 
-    if (maxVisible === participants.length) {
-      return participants.map((participant, index) => ({
-        participant,
-        index,
-      }));
-    }
-
-    if (anglePerCard === 0) {
-      return [];
-    }
-
-    const approximateIndex = -rotation / anglePerCard;
-    let centerIndex = Math.round(approximateIndex);
-
-    if (!Number.isFinite(centerIndex)) {
-      centerIndex = 0;
-    }
-
-    centerIndex =
-      ((centerIndex % participants.length) + participants.length) %
-      participants.length;
-
-    const half = Math.floor(maxVisible / 2);
-
-    return Array.from({ length: maxVisible }, (_, idx) => {
-      const offset = idx - half;
-      let visibleIndex = centerIndex + offset;
-
-      visibleIndex =
-        ((visibleIndex % participants.length) + participants.length) %
+    return Array.from({ length: visibleSlots }, (_, slotIndex) => {
+      const globalIndex = baseSlot + slotIndex;
+      const participantIndex =
+        ((globalIndex % participants.length) + participants.length) %
         participants.length;
+      const slotAngle = slotIndex * angleBetweenCards;
+      const actualAngle = normalizeAngle(slotAngle + rotation);
 
       return {
-        participant: participants[visibleIndex],
-        index: visibleIndex,
+        participant: participants[participantIndex],
+        slotAngle,
+        actualAngle,
       };
     });
-  }, [anglePerCard, participants, rotation]);
+  }, [angleBetweenCards, participants, rotation, visibleSlots]);
 
   useEffect(() => {
     if (!isSpinning || participants.length === 0) {
@@ -121,7 +120,7 @@ export function Carousel3D({
     cancelAnimationFrame(alignmentRef.current ?? 0);
     alignmentRef.current = requestAnimationFrame(() => {
       setRotation((previous) => {
-        const targetRotation = -winnerIndex * anglePerCard;
+        const targetRotation = -winnerIndex * angleBetweenCards;
         const currentRotation = previous % 360;
         const delta = ((targetRotation - currentRotation + 540) % 360) - 180;
         return previous + delta;
@@ -131,7 +130,7 @@ export function Carousel3D({
     return () => {
       cancelAnimationFrame(alignmentRef.current ?? 0);
     };
-  }, [anglePerCard, isSpinning, participants, winnerId]);
+  }, [angleBetweenCards, isSpinning, participants, winnerId]);
 
   if (participants.length === 0) {
     return (
@@ -157,18 +156,27 @@ export function Carousel3D({
             transform: `rotateX(18deg) rotateY(${rotation}deg)`,
           }}
         >
-          {visibleItems.map(({ participant, index }) => {
+          {visibleItems.map(({ participant, slotAngle, actualAngle }) => {
             const isActive = winnerId === participant.id && !isSpinning;
-            const depth = radius + (isActive ? 30 : 0);
+            const isBehind = Math.abs(actualAngle) > 90;
+            const depth = radius + (isActive ? 60 : isBehind ? -40 : 0);
+            const scale = isActive ? 1.1 : isBehind ? 0.94 : 1;
+            const opacity = isActive ? 1 : isBehind ? 0.35 : 0.7;
+            const filter = isBehind ? "blur(4px) brightness(0.65)" : undefined;
+            const clipPath = isBehind
+              ? "inset(0 18% 0 18% round 36px)"
+              : undefined;
+            const zIndex = isActive ? 100 : Math.max(1, 80 - Math.abs(actualAngle));
             return (
               <div
                 key={participant.id}
                 className="absolute left-1/2 top-1/2 w-64 -translate-x-1/2 -translate-y-1/2"
                 style={{
-                  transform: `rotateY(${
-                    index * anglePerCard
-                  }deg) translateZ(${depth}px)`,
-                  opacity: isActive ? 1 : 0.6,
+                  transform: `rotateY(${slotAngle}deg) translateZ(${depth}px) scale(${scale})`,
+                  opacity,
+                  filter,
+                  clipPath,
+                  zIndex,
                 }}
               >
                 <Card participant={participant} isActive={isActive} />

@@ -23,7 +23,7 @@ export function Card({ participant, isActive = false }: CardProps) {
     <div
       className={`group relative rounded-3xl border bg-linear-to-br p-6 shadow-[0_20px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl transition duration-500 ${
         isActive
-          ? "border-white/40 from-white/15 via-white/20 to-white/10 scale-105"
+          ? "border-white/40 from-white/20 via-white/25 to-white/15 scale-110"
           : "border-white/10 from-white/5 via-white/10 to-white/5 scale-100 hover:scale-[1.02]"
       }`}
     >

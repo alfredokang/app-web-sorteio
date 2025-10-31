@@ -12,6 +12,7 @@ interface Carousel3DProps {
 }
 
 const TOTAL_ROTATIONS = 8;
+const MAX_VISIBLE_CARDS = 7;
 
 export function Carousel3D({
   participants,
@@ -86,6 +87,43 @@ export function Carousel3D({
     };
   }, [anglePerCard, isSpinning, participants, winnerId]);
 
+  const radius = 320;
+
+  const visibleCards = useMemo(() => {
+    const total = participants.length;
+    if (total === 0) {
+      return [] as Array<{
+        participant: Participant;
+        angle: number;
+        position: number;
+      }>;
+    }
+
+    const visibleCount = Math.min(total, MAX_VISIBLE_CARDS);
+    const slotAngle = 360 / visibleCount;
+
+    const rawIndex = anglePerCard === 0 ? 0 : -rotation / anglePerCard;
+    const normalizedIndex =
+      total > 0 ? ((rawIndex % total) + total) % total : 0;
+
+    const centerSlot = (visibleCount - 1) / 2;
+    const startIndex = Math.floor(normalizedIndex - centerSlot);
+    const offset = normalizedIndex - (startIndex + centerSlot);
+
+    return Array.from({ length: visibleCount }, (_, slot) => {
+      const participantIndex =
+        ((startIndex + slot) % total + total) % total;
+      const participant = participants[participantIndex];
+      const position = slot - centerSlot - offset;
+
+      return {
+        participant,
+        angle: position * slotAngle,
+        position,
+      };
+    });
+  }, [anglePerCard, participants, rotation]);
+
   if (participants.length === 0) {
     return (
       <div className="flex h-96 w-full items-center justify-center rounded-3xl border border-white/10 bg-white/5 text-sm text-zinc-300">
@@ -93,8 +131,6 @@ export function Carousel3D({
       </div>
     );
   }
-
-  const radius = 320;
 
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-visible">
@@ -104,24 +140,41 @@ export function Carousel3D({
         style={{ perspective: "1200px" }}
       >
         <div
-          className="relative h-[360px] w-[360px] transition-transform duration-500"
+          className="relative h-[360px] w-[360px] overflow-hidden"
           style={{
             transformStyle: "preserve-3d",
-            transform: `rotateX(18deg) rotateY(${rotation}deg)`,
+            transform: "rotateX(18deg)",
           }}
         >
-          {participants.map((participant, index) => {
+          {visibleCards.map(({ participant, angle, position }) => {
             const isActive = winnerId === participant.id && !isSpinning;
-            const depth = radius + (isActive ? 30 : 0);
+
+            const maxDistance = Math.max(visibleCards.length - 1, 1) / 2;
+            const distanceRatio = Math.min(Math.abs(position) / maxDistance, 1);
+
+            const depth =
+              Math.max(radius - distanceRatio * 90, radius * 0.55) +
+              (isActive ? 30 : 0);
+            const scale = isActive
+              ? 1.05
+              : 1 - Math.min(distanceRatio * 0.12, 0.18);
+            const opacity = isActive
+              ? 1
+              : 1 - distanceRatio * 0.55;
+
             return (
               <div
                 key={participant.id}
                 className="absolute left-1/2 top-1/2 w-64 -translate-x-1/2 -translate-y-1/2"
                 style={{
-                  transform: `rotateY(${
-                    index * anglePerCard
-                  }deg) translateZ(${depth}px)`,
-                  opacity: isActive ? 1 : 0.6,
+                  transform: `rotateY(${angle}deg) translateZ(${depth}px) scale(${scale})`,
+                  opacity,
+                  zIndex: Math.round((1 - distanceRatio) * 100),
+                  transition: isSpinning
+                    ? undefined
+                    : "transform 500ms ease, opacity 500ms ease",
+                  pointerEvents: distanceRatio < 0.75 ? "auto" : "none",
+                  backfaceVisibility: "hidden",
                 }}
               >
                 <Card participant={participant} isActive={isActive} />

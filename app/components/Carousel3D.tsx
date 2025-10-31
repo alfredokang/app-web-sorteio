@@ -95,6 +95,18 @@ export function Carousel3D({
   }
 
   const radius = 320;
+  const totalParticipants = participants.length;
+  const rotationInSteps = anglePerCard === 0 ? 0 : rotation / anglePerCard;
+  const frontPositionUnbounded = -rotationInSteps;
+  const normalizedFrontPosition =
+    totalParticipants === 0
+      ? 0
+      : ((frontPositionUnbounded % totalParticipants) + totalParticipants) %
+        totalParticipants;
+
+  const maxVisibleOffset =
+    totalParticipants <= 7 ? totalParticipants / 2 : 3;
+  const fadeBand = totalParticipants <= 7 ? 0 : 0.75;
 
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-visible">
@@ -113,15 +125,30 @@ export function Carousel3D({
           {participants.map((participant, index) => {
             const isActive = winnerId === participant.id && !isSpinning;
             const depth = radius + (isActive ? 30 : 0);
-            const baseOpacity = isActive ? 1 : 0.6;
-            const cardAngle = ((index * anglePerCard + rotation) % 360 + 360) % 360;
-            const angularDistanceFromBottom = Math.min(
-              Math.abs(cardAngle - 180),
-              360 - Math.abs(cardAngle - 180)
-            );
-            const hideThreshold = anglePerCard / 2;
-            const isHidden = angularDistanceFromBottom <= hideThreshold;
-            const opacity = isHidden ? 0 : baseOpacity;
+            let opacityValue = isActive ? 1 : 0.6;
+
+            if (totalParticipants > 7 && anglePerCard > 0) {
+              let diff = index - normalizedFrontPosition;
+              diff = ((diff % totalParticipants) + totalParticipants) % totalParticipants;
+              if (diff > totalParticipants / 2) {
+                diff -= totalParticipants;
+              }
+
+              const distanceFromFront = Math.abs(diff);
+              if (distanceFromFront > maxVisibleOffset + fadeBand) {
+                opacityValue = 0;
+              } else if (distanceFromFront > maxVisibleOffset) {
+                const fadeProgress = Math.min(
+                  (distanceFromFront - maxVisibleOffset) / fadeBand,
+                  1
+                );
+                opacityValue *= 1 - fadeProgress;
+              }
+            }
+
+            const finalOpacity = Math.max(0, opacityValue);
+            const isEffectivelyHidden =
+              totalParticipants > 7 && finalOpacity <= 0.01;
 
             return (
               <div
@@ -129,8 +156,8 @@ export function Carousel3D({
                 className="absolute left-1/2 top-1/2 w-64 -translate-x-1/2 -translate-y-1/2"
                 style={{
                   transform: `rotateY(${index * anglePerCard}deg) translateZ(${depth}px)`,
-                  opacity,
-                  visibility: isHidden ? "hidden" : "visible",
+                  opacity: finalOpacity,
+                  visibility: isEffectivelyHidden ? "hidden" : "visible",
                   transition: "opacity 300ms ease",
                   backfaceVisibility: "hidden",
                 }}

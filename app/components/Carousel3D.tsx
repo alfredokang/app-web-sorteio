@@ -96,17 +96,8 @@ export function Carousel3D({
 
   const radius = 320;
   const totalParticipants = participants.length;
-  const rotationInSteps = anglePerCard === 0 ? 0 : rotation / anglePerCard;
-  const frontPositionUnbounded = -rotationInSteps;
-  const normalizedFrontPosition =
-    totalParticipants === 0
-      ? 0
-      : ((frontPositionUnbounded % totalParticipants) + totalParticipants) %
-        totalParticipants;
-
-  const maxVisibleOffset =
-    totalParticipants <= 7 ? totalParticipants / 2 : 3;
-  const fadeBand = totalParticipants <= 7 ? 0 : 0.75;
+  const maxVisibleStep = totalParticipants <= 7 ? totalParticipants / 2 : 3;
+  const fadeWidthInSteps = totalParticipants <= 7 ? 0 : 0.5;
 
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-visible">
@@ -128,18 +119,19 @@ export function Carousel3D({
             let opacityValue = isActive ? 1 : 0.6;
 
             if (totalParticipants > 7 && anglePerCard > 0) {
-              let diff = index - normalizedFrontPosition;
-              diff = ((diff % totalParticipants) + totalParticipants) % totalParticipants;
-              if (diff > totalParticipants / 2) {
-                diff -= totalParticipants;
+              const cardAngle = index * anglePerCard + rotation;
+              let normalizedAngle = ((cardAngle % 360) + 360) % 360;
+              if (normalizedAngle > 180) {
+                normalizedAngle -= 360;
               }
 
-              const distanceFromFront = Math.abs(diff);
-              if (distanceFromFront > maxVisibleOffset + fadeBand) {
+              const stepsFromFront = Math.abs(normalizedAngle) / anglePerCard;
+
+              if (stepsFromFront > maxVisibleStep + fadeWidthInSteps) {
                 opacityValue = 0;
-              } else if (distanceFromFront > maxVisibleOffset) {
+              } else if (stepsFromFront > maxVisibleStep) {
                 const fadeProgress = Math.min(
-                  (distanceFromFront - maxVisibleOffset) / fadeBand,
+                  (stepsFromFront - maxVisibleStep) / fadeWidthInSteps,
                   1
                 );
                 opacityValue *= 1 - fadeProgress;

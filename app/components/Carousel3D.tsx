@@ -99,23 +99,22 @@ export function Carousel3D({
     cancelAnimationFrame(alignmentRef.current ?? 0);
     alignmentRef.current = requestAnimationFrame(() => {
       setRotation((previous) => {
-        const currentFrontStep = resolveFrontStep(previous, anglePerCard);
-        let stepDifference = targetParticipantIndex - currentFrontStep;
-
-        if (totalParticipants > 0) {
-          const moduloDiff = modulo(stepDifference, totalParticipants);
-          const altDiff = moduloDiff - totalParticipants;
-
-          if (Math.abs(moduloDiff) < Math.abs(stepDifference)) {
-            stepDifference = moduloDiff;
-          }
-
-          if (Math.abs(altDiff) < Math.abs(stepDifference)) {
-            stepDifference = altDiff;
-          }
+        if (anglePerCard === 0 || totalParticipants === 0) {
+          return previous;
         }
 
-        return previous - stepDifference * anglePerCard;
+        const currentStepPrecise = -previous / anglePerCard;
+        let desiredStep = targetParticipantIndex;
+
+        if (totalParticipants > 0) {
+          const cycleSpan = totalParticipants;
+          const nearestCycle = Math.round(
+            (currentStepPrecise - targetParticipantIndex) / cycleSpan
+          );
+          desiredStep = targetParticipantIndex + nearestCycle * cycleSpan;
+        }
+
+        return -desiredStep * anglePerCard;
       });
     });
 

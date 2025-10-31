@@ -12,6 +12,7 @@ interface Carousel3DProps {
 }
 
 const TOTAL_ROTATIONS = 8;
+const MAX_VISIBLE_CARDS = 8;
 
 export function Carousel3D({
   participants,
@@ -22,11 +23,57 @@ export function Carousel3D({
   const [rotation, setRotation] = useState(0);
   const animationRef = useRef<number | null>(null);
   const startTimestamp = useRef<number | null>(null);
-  const alignmentRef = useRef<number | number>(null);
+  const alignmentRef = useRef<number | null>(null);
 
   const anglePerCard = useMemo(() => {
     return participants.length > 0 ? 360 / participants.length : 0;
   }, [participants.length]);
+
+  const visibleItems = useMemo(() => {
+    if (participants.length === 0) {
+      return [];
+    }
+
+    const maxVisible = Math.min(participants.length, MAX_VISIBLE_CARDS);
+
+    if (maxVisible === participants.length) {
+      return participants.map((participant, index) => ({
+        participant,
+        index,
+      }));
+    }
+
+    if (anglePerCard === 0) {
+      return [];
+    }
+
+    const approximateIndex = -rotation / anglePerCard;
+    let centerIndex = Math.round(approximateIndex);
+
+    if (!Number.isFinite(centerIndex)) {
+      centerIndex = 0;
+    }
+
+    centerIndex =
+      ((centerIndex % participants.length) + participants.length) %
+      participants.length;
+
+    const half = Math.floor(maxVisible / 2);
+
+    return Array.from({ length: maxVisible }, (_, idx) => {
+      const offset = idx - half;
+      let visibleIndex = centerIndex + offset;
+
+      visibleIndex =
+        ((visibleIndex % participants.length) + participants.length) %
+        participants.length;
+
+      return {
+        participant: participants[visibleIndex],
+        index: visibleIndex,
+      };
+    });
+  }, [anglePerCard, participants, rotation]);
 
   useEffect(() => {
     if (!isSpinning || participants.length === 0) {
@@ -110,7 +157,7 @@ export function Carousel3D({
             transform: `rotateX(18deg) rotateY(${rotation}deg)`,
           }}
         >
-          {participants.map((participant, index) => {
+          {visibleItems.map(({ participant, index }) => {
             const isActive = winnerId === participant.id && !isSpinning;
             const depth = radius + (isActive ? 30 : 0);
             return (

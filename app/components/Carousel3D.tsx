@@ -89,39 +89,39 @@ export function Carousel3D({
 
   const radius = 320;
 
-  const visibleCards = useMemo(() => {
+  const visibleIndices = useMemo(() => {
     const total = participants.length;
-    if (total === 0) {
-      return [] as Array<{
-        participant: Participant;
-        angle: number;
-        position: number;
-      }>;
+
+    if (total <= MAX_VISIBLE_CARDS) {
+      return new Set(participants.map((_, index) => index));
     }
 
-    const visibleCount = Math.min(total, MAX_VISIBLE_CARDS);
-    const slotAngle = 360 / visibleCount;
+    const normalizeAngle = (value: number) => {
+      const wrapped = ((value % 360) + 360) % 360;
+      return wrapped > 180 ? wrapped - 360 : wrapped;
+    };
 
-    const rawIndex = anglePerCard === 0 ? 0 : -rotation / anglePerCard;
-    const normalizedIndex =
-      total > 0 ? ((rawIndex % total) + total) % total : 0;
+    const normalizedRotation = ((rotation % 360) + 360) % 360;
 
-    const centerSlot = (visibleCount - 1) / 2;
-    const startIndex = Math.floor(normalizedIndex - centerSlot);
-    const offset = normalizedIndex - (startIndex + centerSlot);
-
-    return Array.from({ length: visibleCount }, (_, slot) => {
-      const participantIndex =
-        ((startIndex + slot) % total + total) % total;
-      const participant = participants[participantIndex];
-      const position = slot - centerSlot - offset;
+    const prioritized = participants.map((_, index) => {
+      const baseAngle = index * anglePerCard;
+      const relativeAngle = normalizeAngle(baseAngle + normalizedRotation);
 
       return {
-        participant,
-        angle: position * slotAngle,
-        position,
+        index,
+        distance: Math.abs(relativeAngle),
+        relativeAngle,
       };
     });
+
+    prioritized.sort((a, b) => {
+      if (a.distance !== b.distance) {
+        return a.distance - b.distance;
+      }
+      return a.relativeAngle - b.relativeAngle;
+    });
+
+    return new Set(prioritized.slice(0, MAX_VISIBLE_CARDS).map((entry) => entry.index));
   }, [anglePerCard, participants, rotation]);
 
   if (participants.length === 0) {
@@ -140,40 +140,27 @@ export function Carousel3D({
         style={{ perspective: "1200px" }}
       >
         <div
-          className="relative h-[360px] w-[360px] overflow-hidden"
+          className="relative h-[360px] w-[360px] transition-transform duration-500"
           style={{
             transformStyle: "preserve-3d",
-            transform: "rotateX(18deg)",
+            transform: `rotateX(18deg) rotateY(${rotation}deg)`,
           }}
         >
-          {visibleCards.map(({ participant, angle, position }) => {
+          {participants.map((participant, index) => {
+            if (!visibleIndices.has(index)) {
+              return null;
+            }
+
             const isActive = winnerId === participant.id && !isSpinning;
-
-            const maxDistance = Math.max(visibleCards.length - 1, 1) / 2;
-            const distanceRatio = Math.min(Math.abs(position) / maxDistance, 1);
-
-            const depth =
-              Math.max(radius - distanceRatio * 90, radius * 0.55) +
-              (isActive ? 30 : 0);
-            const scale = isActive
-              ? 1.05
-              : 1 - Math.min(distanceRatio * 0.12, 0.18);
-            const opacity = isActive
-              ? 1
-              : 1 - distanceRatio * 0.55;
+            const depth = radius + (isActive ? 30 : 0);
 
             return (
               <div
                 key={participant.id}
                 className="absolute left-1/2 top-1/2 w-64 -translate-x-1/2 -translate-y-1/2"
                 style={{
-                  transform: `rotateY(${angle}deg) translateZ(${depth}px) scale(${scale})`,
-                  opacity,
-                  zIndex: Math.round((1 - distanceRatio) * 100),
-                  transition: isSpinning
-                    ? undefined
-                    : "transform 500ms ease, opacity 500ms ease",
-                  pointerEvents: distanceRatio < 0.75 ? "auto" : "none",
+                  transform: `rotateY(${index * anglePerCard}deg) translateZ(${depth}px)`,
+                  opacity: isActive ? 1 : 0.6,
                   backfaceVisibility: "hidden",
                 }}
               >

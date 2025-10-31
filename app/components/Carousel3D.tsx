@@ -14,6 +14,24 @@ interface Carousel3DProps {
 const TOTAL_ROTATIONS = 8;
 const MAX_SLOT_COUNT = 8;
 
+const modulo = (value: number, divisor: number) => {
+  if (divisor === 0) {
+    return 0;
+  }
+
+  const remainder = value % divisor;
+  return remainder < 0 ? remainder + divisor : remainder;
+};
+
+const resolveFrontStep = (rotation: number, anglePerCard: number) => {
+  if (anglePerCard === 0) {
+    return 0;
+  }
+
+  const stepExact = -rotation / anglePerCard;
+  return stepExact >= 0 ? Math.floor(stepExact) : Math.ceil(stepExact);
+};
+
 export function Carousel3D({
   participants,
   isSpinning,
@@ -28,95 +46,13 @@ export function Carousel3D({
   const totalParticipants = participants.length;
   const slotCount =
     totalParticipants > MAX_SLOT_COUNT ? MAX_SLOT_COUNT : totalParticipants;
-  const virtualizationActive = totalParticipants > MAX_SLOT_COUNT;
-
-  const [slotAssignments, setSlotAssignments] = useState<Participant[]>(() =>
-    participants.slice(0, slotCount)
-  );
-  const slotAssignmentsRef = useRef<Participant[]>(slotAssignments);
-  const hiddenStateRef = useRef<boolean[]>([]);
-  const rangeStartRef = useRef(0);
-  const rangeEndRef = useRef(0);
-  const rotationDirectionRef = useRef<"forward" | "backward">("forward");
-  const previousRotationRef = useRef(0);
-  const lastParticipantsKeyRef = useRef<string | null>(null);
-  const lastVirtualizationRef = useRef<boolean>(virtualizationActive);
-  const previousParticipantsRef = useRef<Participant[] | null>(null);
-
-  const participantsKey = useMemo(
-    () => participants.map((participant) => participant.id).join("|"),
-    [participants]
-  );
 
   const anglePerCard = useMemo(() => {
     return slotCount > 0 ? 360 / slotCount : 0;
   }, [slotCount]);
 
   useEffect(() => {
-    slotAssignmentsRef.current = slotAssignments;
-  }, [slotAssignments]);
-
-  useEffect(() => {
-    const previous = previousRotationRef.current;
-    const delta = rotation - previous;
-    if (delta !== 0) {
-      rotationDirectionRef.current = delta < 0 ? "forward" : "backward";
-    }
-    previousRotationRef.current = rotation;
-  }, [rotation]);
-
-  useEffect(() => {
-    const arrayChanged = previousParticipantsRef.current !== participants;
-    previousParticipantsRef.current = participants;
-
-    const keyChanged = lastParticipantsKeyRef.current !== participantsKey;
-    const virtualizationChanged =
-      lastVirtualizationRef.current !== virtualizationActive;
-
-    if (!arrayChanged && !keyChanged && !virtualizationChanged) {
-      return;
-    }
-
-    lastParticipantsKeyRef.current = participantsKey;
-    lastVirtualizationRef.current = virtualizationActive;
-
-    if (!virtualizationActive) {
-      slotAssignmentsRef.current = participants;
-      hiddenStateRef.current = [];
-      rangeStartRef.current = 0;
-      rangeEndRef.current = totalParticipants;
-      return;
-    }
-
-    if (totalParticipants === 0) {
-      slotAssignmentsRef.current = [];
-      hiddenStateRef.current = [];
-      rangeStartRef.current = 0;
-      rangeEndRef.current = 0;
-      return;
-    }
-
-    const initialAssignments = Array.from({ length: slotCount }, (_, index) => {
-      const participantIndex = index % totalParticipants;
-      return participants[participantIndex];
-    });
-
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSlotAssignments(initialAssignments);
-    slotAssignmentsRef.current = initialAssignments;
-    hiddenStateRef.current = new Array(slotCount).fill(false);
-    rangeStartRef.current = 0;
-    rangeEndRef.current = slotCount % totalParticipants;
-  }, [
-    participants,
-    participantsKey,
-    slotCount,
-    totalParticipants,
-    virtualizationActive,
-  ]);
-
-  useEffect(() => {
-    if (!isSpinning || participants.length === 0) {
+    if (!isSpinning || totalParticipants === 0) {
       return;
     }
 
@@ -127,6 +63,7 @@ export function Carousel3D({
       if (startTimestamp.current === null) {
         startTimestamp.current = timestamp;
       }
+
       const elapsed = timestamp - startTimestamp.current;
       const clamped = Math.min(elapsed, spinDuration);
       const progress = clamped / spinDuration;
@@ -144,43 +81,41 @@ export function Carousel3D({
     return () => {
       cancelAnimationFrame(animationRef.current ?? 0);
     };
-  }, [isSpinning, participants.length, spinDuration]);
+  }, [isSpinning, spinDuration, totalParticipants]);
 
   useEffect(() => {
-    if (isSpinning || !winnerId || participants.length === 0) {
+    if (isSpinning || !winnerId || totalParticipants === 0 || anglePerCard === 0) {
       return;
     }
 
-    const resolveWinnerIndex = () => {
-      if (virtualizationActive) {
-        const assignments = slotAssignmentsRef.current;
-        if (assignments.length === slotCount) {
-          const slotIndex = assignments.findIndex(
-            (participant) => participant.id === winnerId
-          );
+    const targetParticipantIndex = participants.findIndex(
+      (participant) => participant.id === winnerId
+    );
 
-          if (slotIndex !== -1) {
-            return slotIndex;
-          }
-        }
-      }
-
-      return participants.findIndex((participant) => participant.id === winnerId);
-    };
-
-    const winnerIndex = resolveWinnerIndex();
-
-    if (winnerIndex === -1) {
+    if (targetParticipantIndex === -1) {
       return;
     }
 
     cancelAnimationFrame(alignmentRef.current ?? 0);
     alignmentRef.current = requestAnimationFrame(() => {
       setRotation((previous) => {
-        const targetRotation = -winnerIndex * anglePerCard;
-        const currentRotation = previous % 360;
-        const delta = ((targetRotation - currentRotation + 540) % 360) - 180;
-        return previous + delta;
+        const currentFrontStep = resolveFrontStep(previous, anglePerCard);
+        let stepDifference = targetParticipantIndex - currentFrontStep;
+
+        if (totalParticipants > 0) {
+          const moduloDiff = modulo(stepDifference, totalParticipants);
+          const altDiff = moduloDiff - totalParticipants;
+
+          if (Math.abs(moduloDiff) < Math.abs(stepDifference)) {
+            stepDifference = moduloDiff;
+          }
+
+          if (Math.abs(altDiff) < Math.abs(stepDifference)) {
+            stepDifference = altDiff;
+          }
+        }
+
+        return previous - stepDifference * anglePerCard;
       });
     });
 
@@ -191,9 +126,7 @@ export function Carousel3D({
     anglePerCard,
     isSpinning,
     participants,
-    slotAssignments,
-    slotCount,
-    virtualizationActive,
+    totalParticipants,
     winnerId,
   ]);
 
@@ -201,31 +134,45 @@ export function Carousel3D({
   const maxVisibleStep = slotCount > 7 ? 3 : slotCount / 2;
   const fadeWidthInSteps = slotCount > 7 ? 0.5 : 0;
 
-  const cardsSource =
-    virtualizationActive && slotAssignments.length === slotCount
-      ? slotAssignments
-      : virtualizationActive
-      ? participants.slice(0, slotCount)
-      : participants;
+  if (totalParticipants === 0) {
+    return (
+      <div className="flex h-96 w-full items-center justify-center rounded-3xl border border-white/10 bg-white/5 text-sm text-zinc-300">
+        Carregando participantes...
+      </div>
+    );
+  }
 
-  const hiddenStateTemplate = useMemo(
-    () =>
-      virtualizationActive
-        ? Array.from({ length: slotCount }, () => false)
-        : [],
-    [slotCount, virtualizationActive]
-  );
+  const frontStep = resolveFrontStep(rotation, anglePerCard);
+  const frontSlotIndex = slotCount > 0 ? modulo(frontStep, slotCount) : 0;
+  const frontParticipantIndex = modulo(frontStep, totalParticipants);
 
-  const currentHiddenStates = hiddenStateTemplate.slice();
+  const cardElements = Array.from({ length: slotCount }, (_, slotIndex) => {
+    const slotOffsetRaw = modulo(slotIndex - frontSlotIndex, slotCount);
+    let slotOffset = slotOffsetRaw;
 
-  const cardElements = cardsSource.map((participant, slotIndex) => {
+    if (slotCount > 0 && slotOffset > slotCount / 2) {
+      slotOffset -= slotCount;
+    }
+
+    const participantIndex = modulo(
+      frontParticipantIndex + slotOffset,
+      totalParticipants
+    );
+
+    const participant = participants[participantIndex];
+
+    if (!participant) {
+      return null;
+    }
+
     const isActive = winnerId === participant.id && !isSpinning;
     const depth = radius + (isActive ? 30 : 0);
     let opacityValue = isActive ? 1 : 0.6;
 
     if (anglePerCard > 0) {
       const cardAngle = slotIndex * anglePerCard + rotation;
-      let normalizedAngle = ((cardAngle % 360) + 360) % 360;
+      let normalizedAngle = modulo(cardAngle, 360);
+
       if (normalizedAngle > 180) {
         normalizedAngle -= 360;
       }
@@ -250,13 +197,9 @@ export function Carousel3D({
     const finalOpacity = Math.max(0, opacityValue);
     const isEffectivelyHidden = finalOpacity <= 0.01;
 
-    if (virtualizationActive && slotIndex < currentHiddenStates.length) {
-      currentHiddenStates[slotIndex] = isEffectivelyHidden;
-    }
-
     return (
       <div
-        key={virtualizationActive ? `slot-${slotIndex}` : participant.id}
+        key={`slot-${slotIndex}-${participant.id}`}
         className="absolute left-1/2 top-1/2 w-64 -translate-x-1/2 -translate-y-1/2"
         style={{
           transform: `rotateY(${slotIndex * anglePerCard}deg) translateZ(${depth}px)`,
@@ -270,87 +213,6 @@ export function Carousel3D({
     );
   });
 
-  const hiddenSignature = virtualizationActive
-    ? currentHiddenStates.map((value) => (value ? "1" : "0")).join("")
-    : "";
-
-  useEffect(() => {
-    if (!virtualizationActive || totalParticipants === 0) {
-      hiddenStateRef.current = virtualizationActive
-        ? new Array(slotCount).fill(false)
-        : [];
-      return;
-    }
-
-    if (slotAssignmentsRef.current.length !== slotCount) {
-      return;
-    }
-
-    const previousHidden = hiddenStateRef.current;
-    const updatedAssignments = [...slotAssignmentsRef.current];
-    const latestHiddenStates = currentHiddenStates;
-    let hasChanges = false;
-
-    for (let index = 0; index < slotCount; index += 1) {
-      const wasHidden = previousHidden[index] ?? false;
-      const isHidden = latestHiddenStates[index] ?? false;
-
-      if (isHidden && !wasHidden) {
-        const direction = rotationDirectionRef.current;
-
-        if (direction === "forward") {
-          const participantIndex = rangeEndRef.current;
-          const participant = participants[participantIndex];
-
-          if (participant) {
-            updatedAssignments[index] = participant;
-            rangeStartRef.current =
-              (rangeStartRef.current + 1) % totalParticipants;
-            rangeEndRef.current =
-              (rangeEndRef.current + 1) % totalParticipants;
-            hasChanges = true;
-          }
-        } else {
-          rangeStartRef.current =
-            (rangeStartRef.current - 1 + totalParticipants) %
-            totalParticipants;
-          rangeEndRef.current =
-            (rangeEndRef.current - 1 + totalParticipants) % totalParticipants;
-
-          const participantIndex = rangeStartRef.current;
-          const participant = participants[participantIndex];
-
-          if (participant) {
-            updatedAssignments[index] = participant;
-            hasChanges = true;
-          }
-        }
-      }
-    }
-
-    if (hasChanges) {
-      slotAssignmentsRef.current = updatedAssignments;
-      setSlotAssignments(updatedAssignments);
-    }
-
-    hiddenStateRef.current = [...latestHiddenStates];
-  }, [
-    hiddenSignature,
-    currentHiddenStates,
-    participants,
-    slotCount,
-    totalParticipants,
-    virtualizationActive,
-  ]);
-
-  if (participants.length === 0) {
-    return (
-      <div className="flex h-96 w-full items-center justify-center rounded-3xl border border-white/10 bg-white/5 text-sm text-zinc-300">
-        Carregando participantes...
-      </div>
-    );
-  }
-
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-visible">
       <div className="absolute inset-0 rounded-[48px] bg-linear-to-br from-slate-900/80 via-indigo-900/60 to-black/80 blur-3xl" />
@@ -362,7 +224,7 @@ export function Carousel3D({
           className="relative h-[360px] w-[360px] transition-transform duration-500"
           style={{
             transformStyle: "preserve-3d",
-            transform: `rotateX(18deg) rotateY(${rotation}deg)`
+            transform: `rotateX(18deg) rotateY(${rotation}deg)`,
           }}
         >
           {cardElements}

@@ -159,7 +159,6 @@ export function Carousel3D({
                   opacity: finalOpacity,
                   visibility: isEffectivelyHidden ? "hidden" : "visible",
                   transition: "opacity 300ms ease",
-                  backfaceVisibility: "hidden",
                 }}
               >
                 <Card participant={participant} isActive={isActive} />

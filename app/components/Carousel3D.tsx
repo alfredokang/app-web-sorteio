@@ -97,10 +97,10 @@ export function Carousel3D({
   const radius = 320;
 
   return (
-    <div className="relative flex h-[420px] w-full items-center justify-center overflow-visible">
+    <div className="relative flex h-full w-full items-center justify-center overflow-visible">
       <div className="absolute inset-0 rounded-[48px] bg-linear-to-br from-slate-900/80 via-indigo-900/60 to-black/80 blur-3xl" />
       <div
-        className="relative flex h-full w-full items-center justify-center"
+        className="relative flex h-full w-full items-center justify-center mt-40 mb-13"
         style={{ perspective: "1200px" }}
       >
         <div

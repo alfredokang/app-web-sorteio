@@ -62,6 +62,34 @@ const MOCK_PARTICIPANTS: Participant[] = [
     comment: "Café passado na prensa francesa tem outro sabor.",
     rating: 5,
   },
+  {
+    id: "9",
+    name: "111111",
+    gender: "male",
+    comment: "Affogato é a sobremesa perfeita.",
+    rating: 5,
+  },
+  {
+    id: "10",
+    name: "2222222",
+    gender: "female",
+    comment: "Macchiato com leite vegetal é o meu favorito.",
+    rating: 4,
+  },
+  {
+    id: "11",
+    name: "33333333",
+    gender: "male",
+    comment: "Café passado na prensa francesa tem outro sabor.",
+    rating: 5,
+  },
+  {
+    id: "12",
+    name: "444444444",
+    gender: "male",
+    comment: "Café passado na prensa francesa tem outro sabor.",
+    rating: 5,
+  },
 ];
 
 const PRESELECTED_WINNER_ID = "4";

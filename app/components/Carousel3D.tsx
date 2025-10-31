@@ -115,21 +115,13 @@ export function Carousel3D({
             const depth = radius + (isActive ? 30 : 0);
             const baseOpacity = isActive ? 1 : 0.6;
             const cardAngle = ((index * anglePerCard + rotation) % 360 + 360) % 360;
-            const distanceFromBack = Math.abs(180 - cardAngle);
-            const fadeStart = 45;
-            const fadeEnd = 20;
-
-            let visibilityFactor = 1;
-            if (distanceFromBack < fadeStart) {
-              if (distanceFromBack <= fadeEnd) {
-                visibilityFactor = 0;
-              } else {
-                visibilityFactor = (distanceFromBack - fadeEnd) / (fadeStart - fadeEnd);
-              }
-            }
-
-            const opacity = baseOpacity * visibilityFactor;
-            const isHidden = visibilityFactor === 0;
+            const angularDistanceFromBottom = Math.min(
+              Math.abs(cardAngle - 180),
+              360 - Math.abs(cardAngle - 180)
+            );
+            const hideThreshold = anglePerCard / 2;
+            const isHidden = angularDistanceFromBottom <= hideThreshold;
+            const opacity = isHidden ? 0 : baseOpacity;
 
             return (
               <div

@@ -20,9 +20,9 @@ export function Carousel3D({
   spinDuration = 10000,
 }: Carousel3DProps) {
   const [rotation, setRotation] = useState(0);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | null>(null);
   const startTimestamp = useRef<number | null>(null);
-  const alignmentRef = useRef<number>();
+  const alignmentRef = useRef<number | number>(null);
 
   const anglePerCard = useMemo(() => {
     return participants.length > 0 ? 360 / participants.length : 0;
@@ -64,7 +64,9 @@ export function Carousel3D({
       return;
     }
 
-    const winnerIndex = participants.findIndex((person) => person.id === winnerId);
+    const winnerIndex = participants.findIndex(
+      (person) => person.id === winnerId
+    );
     if (winnerIndex === -1) {
       return;
     }
@@ -96,7 +98,7 @@ export function Carousel3D({
 
   return (
     <div className="relative flex h-[420px] w-full items-center justify-center overflow-visible">
-      <div className="absolute inset-0 rounded-[48px] bg-gradient-to-br from-slate-900/80 via-indigo-900/60 to-black/80 blur-3xl" />
+      <div className="absolute inset-0 rounded-[48px] bg-linear-to-br from-slate-900/80 via-indigo-900/60 to-black/80 blur-3xl" />
       <div
         className="relative flex h-full w-full items-center justify-center"
         style={{ perspective: "1200px" }}
@@ -115,7 +117,9 @@ export function Carousel3D({
                 key={participant.id}
                 className="absolute left-1/2 top-1/2 w-64 -translate-x-1/2 -translate-y-1/2"
                 style={{
-                  transform: `rotateY(${index * anglePerCard}deg) translateZ(${radius}px)`,
+                  transform: `rotateY(${
+                    index * anglePerCard
+                  }deg) translateZ(${radius}px)`,
                 }}
               >
                 <Card participant={participant} isActive={isActive} />
@@ -125,7 +129,7 @@ export function Carousel3D({
         </div>
       </div>
       <div className="absolute inset-0 rounded-[48px] border border-white/10" />
-      <div className="pointer-events-none absolute inset-0 rounded-[48px] bg-gradient-to-b from-transparent via-white/5 to-transparent" />
+      <div className="pointer-events-none absolute inset-0 rounded-[48px] bg-linear-to-br from-transparent via-white/5 to-transparent" />
     </div>
   );
 }

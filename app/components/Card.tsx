@@ -21,7 +21,7 @@ export function Card({ participant, isActive = false }: CardProps) {
 
   return (
     <div
-      className={`group relative rounded-3xl border border-white/10 bg-gradient-to-br from-white/5 via-white/2 to-white/5 p-6 shadow-[0_20px_40px_rgba(0,0,0,0.35)] transition-transform duration-500 ${
+      className={`group relative rounded-3xl border border-white/10 bg-linear-to-br from-white/5 via-white/2 to-white/5 p-6 shadow-[0_20px_40px_rgba(0,0,0,0.35)] transition-transform duration-500 ${
         isActive ? "scale-105 border-white/40" : "scale-100 hover:scale-[1.02]"
       }`}
     >

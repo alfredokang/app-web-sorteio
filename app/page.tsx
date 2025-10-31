@@ -74,7 +74,7 @@ export default function Home() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [seed, setSeed] = useState(() => Math.floor(Math.random() * 100000));
   const [hasResult, setHasResult] = useState(false);
-  const spinTimeout = useRef<NodeJS.Timeout>();
+  const spinTimeout = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const loadTimeout = setTimeout(() => {

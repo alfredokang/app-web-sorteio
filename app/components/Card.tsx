@@ -14,7 +14,10 @@ const avatarByGender: Record<Participant["gender"], string> = {
 };
 
 export function Card({ participant, isActive = false }: CardProps) {
-  const stars = Array.from({ length: 5 }, (_, index) => index < participant.rating);
+  const stars = Array.from(
+    { length: 5 },
+    (_, index) => index < participant.rating
+  );
 
   return (
     <div
@@ -35,7 +38,9 @@ export function Card({ participant, isActive = false }: CardProps) {
             />
           </div>
           <div className="flex flex-col">
-            <span className="text-lg font-semibold text-white">{participant.name}</span>
+            <span className="text-lg font-semibold text-white">
+              {participant.name}
+            </span>
             <div className="flex items-center gap-1 text-sm text-amber-400">
               {stars.map((filled, index) => (
                 <span key={index}>{filled ? "★" : "☆"}</span>
@@ -43,9 +48,7 @@ export function Card({ participant, isActive = false }: CardProps) {
             </div>
           </div>
         </div>
-        <p className="text-sm text-zinc-200">
-          “{participant.comment}”
-        </p>
+        <p className="text-sm text-zinc-200">“{participant.comment}”</p>
       </div>
     </div>
   );

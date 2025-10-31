@@ -101,11 +101,10 @@ export default function Home() {
 
   const winner = useMemo(
     () => participants.find((person) => person.id === winnerId) ?? null,
-    [participants, winnerId],
+    [participants, winnerId]
   );
 
-  const isButtonDisabled =
-    isSpinning || !participants.length || !winnerId;
+  const isButtonDisabled = isSpinning || !participants.length || !winnerId;
 
   const handleStart = () => {
     if (isButtonDisabled) {
@@ -140,7 +139,9 @@ export default function Home() {
             Prepare-se para descobrir quem leva o kit exclusivo.
           </h1>
           <p className="mx-auto max-w-3xl text-lg text-zinc-300 lg:mx-0">
-            Leads apaixonados por café responderam ao nosso WhatsApp com suas histórias aromáticas. Agora é hora de ver a roleta revelar o grande vencedor ao vivo.
+            Leads apaixonados por café responderam ao nosso WhatsApp com suas
+            histórias aromáticas. Agora é hora de ver a roleta revelar o grande
+            vencedor ao vivo.
           </p>
           <div className="mt-4 flex flex-col items-center gap-4 lg:flex-row lg:items-center">
             <button
@@ -157,8 +158,8 @@ export default function Home() {
               {isSpinning
                 ? "A roleta vai revelar o vencedor em instantes."
                 : winner
-                  ? "Pronto para girar! O vencedor já foi escolhido pelo backend."
-                  : "Carregando participantes e resultado..."}
+                ? "Pronto para girar! O vencedor já foi escolhido pelo backend."
+                : "Carregando participantes e resultado..."}
             </span>
           </div>
         </header>
@@ -179,7 +180,9 @@ export default function Home() {
                 Vencedor Confirmado
               </p>
               <h2 className="text-3xl font-semibold text-white sm:text-4xl">
-                {hasResult ? `${winner.name} levou o prêmio!` : "Aguardando o resultado..."}
+                {hasResult
+                  ? `${winner.name} levou o prêmio!`
+                  : "Aguardando o resultado..."}
               </h2>
               <p className="max-w-2xl text-base text-zinc-300">
                 {hasResult

@@ -1,0 +1,22 @@
+{
+  "name": "Click Hostel",
+  "short_name": "Click Hostel",
+  "description": "Hospedagens completas e versáteis em São Paulo — quartos individuais, casas inteiras e estrutura ideal para eventos, negócios e turismo.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#10B981",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

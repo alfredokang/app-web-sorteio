@@ -21,11 +21,19 @@ export function Card({ participant, isActive = false }: CardProps) {
 
   return (
     <div
-      className={`group relative rounded-3xl border border-white/10 bg-linear-to-br from-white/5 via-white/2 to-white/5 p-6 shadow-[0_20px_40px_rgba(0,0,0,0.35)] transition-transform duration-500 ${
-        isActive ? "scale-105 border-white/40" : "scale-100 hover:scale-[1.02]"
+      className={`group relative rounded-3xl border bg-linear-to-br p-6 shadow-[0_20px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl transition duration-500 ${
+        isActive
+          ? "border-white/40 from-white/15 via-white/20 to-white/10 scale-105"
+          : "border-white/10 from-white/5 via-white/10 to-white/5 scale-100 hover:scale-[1.02]"
       }`}
     >
-      <div className="absolute inset-0 rounded-3xl bg-white/5 opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-40" />
+      <div
+        className={`absolute inset-0 rounded-3xl blur-xl transition-opacity duration-500 ${
+          isActive
+            ? "bg-white/10 opacity-40 group-hover:opacity-60"
+            : "bg-white/5 opacity-0 group-hover:opacity-40"
+        }`}
+      />
       <div className="relative flex flex-col gap-4">
         <div className="flex items-center gap-4">
           <div className="relative h-16 w-16 overflow-hidden rounded-2xl border border-white/20 bg-white/5">

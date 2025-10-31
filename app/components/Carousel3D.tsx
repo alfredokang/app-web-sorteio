@@ -107,11 +107,12 @@ export function Carousel3D({
           className="relative h-[360px] w-[360px] transition-transform duration-500"
           style={{
             transformStyle: "preserve-3d",
-            transform: `rotateY(${rotation}deg)`,
+            transform: `rotateX(18deg) rotateY(${rotation}deg)`,
           }}
         >
           {participants.map((participant, index) => {
             const isActive = winnerId === participant.id && !isSpinning;
+            const depth = radius + (isActive ? 30 : 0);
             return (
               <div
                 key={participant.id}
@@ -119,7 +120,8 @@ export function Carousel3D({
                 style={{
                   transform: `rotateY(${
                     index * anglePerCard
-                  }deg) translateZ(${radius}px)`,
+                  }deg) translateZ(${depth}px)`,
+                  opacity: isActive ? 1 : 0.6,
                 }}
               >
                 <Card participant={participant} isActive={isActive} />

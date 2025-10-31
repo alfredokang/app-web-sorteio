@@ -151,9 +151,25 @@ export function Carousel3D({
       return;
     }
 
-    const winnerIndex = participants.findIndex(
-      (person) => person.id === winnerId
-    );
+    const resolveWinnerIndex = () => {
+      if (virtualizationActive) {
+        const assignments = slotAssignmentsRef.current;
+        if (assignments.length === slotCount) {
+          const slotIndex = assignments.findIndex(
+            (participant) => participant.id === winnerId
+          );
+
+          if (slotIndex !== -1) {
+            return slotIndex;
+          }
+        }
+      }
+
+      return participants.findIndex((participant) => participant.id === winnerId);
+    };
+
+    const winnerIndex = resolveWinnerIndex();
+
     if (winnerIndex === -1) {
       return;
     }
@@ -171,7 +187,15 @@ export function Carousel3D({
     return () => {
       cancelAnimationFrame(alignmentRef.current ?? 0);
     };
-  }, [anglePerCard, isSpinning, participants, winnerId]);
+  }, [
+    anglePerCard,
+    isSpinning,
+    participants,
+    slotAssignments,
+    slotCount,
+    virtualizationActive,
+    winnerId,
+  ]);
 
   const radius = 320;
   const maxVisibleStep = slotCount > 7 ? 3 : slotCount / 2;

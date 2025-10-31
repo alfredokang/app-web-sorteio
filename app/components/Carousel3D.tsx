@@ -130,8 +130,9 @@ export function Carousel3D({
   ]);
 
   const radius = 320;
-  const maxVisibleStep = slotCount > 7 ? 3 : slotCount / 2;
-  const fadeWidthInSteps = slotCount > 7 ? 0.5 : 0;
+  const hideUnderside = slotCount > 7 && !isSpinning;
+  const maxVisibleStep = hideUnderside ? 3 : slotCount / 2;
+  const fadeWidthInSteps = hideUnderside ? 0.5 : 0;
 
   if (totalParticipants === 0) {
     return (
@@ -178,10 +179,13 @@ export function Carousel3D({
 
       const stepsFromFront = Math.abs(normalizedAngle) / anglePerCard;
 
-      if (slotCount > 7 && stepsFromFront > maxVisibleStep + fadeWidthInSteps) {
+      if (
+        hideUnderside &&
+        stepsFromFront > maxVisibleStep + fadeWidthInSteps
+      ) {
         opacityValue = 0;
       } else if (
-        slotCount > 7 &&
+        hideUnderside &&
         fadeWidthInSteps > 0 &&
         stepsFromFront > maxVisibleStep
       ) {

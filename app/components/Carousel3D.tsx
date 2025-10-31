@@ -12,6 +12,7 @@ interface Carousel3DProps {
 }
 
 const TOTAL_ROTATIONS = 8;
+const MAX_SLOT_COUNT = 8;
 
 export function Carousel3D({
   participants,
@@ -24,9 +25,95 @@ export function Carousel3D({
   const startTimestamp = useRef<number | null>(null);
   const alignmentRef = useRef<number | null>(null);
 
+  const totalParticipants = participants.length;
+  const slotCount =
+    totalParticipants > MAX_SLOT_COUNT ? MAX_SLOT_COUNT : totalParticipants;
+  const virtualizationActive = totalParticipants > MAX_SLOT_COUNT;
+
+  const [slotAssignments, setSlotAssignments] = useState<Participant[]>(() =>
+    participants.slice(0, slotCount)
+  );
+  const slotAssignmentsRef = useRef<Participant[]>(slotAssignments);
+  const hiddenStateRef = useRef<boolean[]>([]);
+  const rangeStartRef = useRef(0);
+  const rangeEndRef = useRef(0);
+  const rotationDirectionRef = useRef<"forward" | "backward">("forward");
+  const previousRotationRef = useRef(0);
+  const lastParticipantsKeyRef = useRef<string | null>(null);
+  const lastVirtualizationRef = useRef<boolean>(virtualizationActive);
+  const previousParticipantsRef = useRef<Participant[] | null>(null);
+
+  const participantsKey = useMemo(
+    () => participants.map((participant) => participant.id).join("|"),
+    [participants]
+  );
+
   const anglePerCard = useMemo(() => {
-    return participants.length > 0 ? 360 / participants.length : 0;
-  }, [participants.length]);
+    return slotCount > 0 ? 360 / slotCount : 0;
+  }, [slotCount]);
+
+  useEffect(() => {
+    slotAssignmentsRef.current = slotAssignments;
+  }, [slotAssignments]);
+
+  useEffect(() => {
+    const previous = previousRotationRef.current;
+    const delta = rotation - previous;
+    if (delta !== 0) {
+      rotationDirectionRef.current = delta < 0 ? "forward" : "backward";
+    }
+    previousRotationRef.current = rotation;
+  }, [rotation]);
+
+  useEffect(() => {
+    const arrayChanged = previousParticipantsRef.current !== participants;
+    previousParticipantsRef.current = participants;
+
+    const keyChanged = lastParticipantsKeyRef.current !== participantsKey;
+    const virtualizationChanged =
+      lastVirtualizationRef.current !== virtualizationActive;
+
+    if (!arrayChanged && !keyChanged && !virtualizationChanged) {
+      return;
+    }
+
+    lastParticipantsKeyRef.current = participantsKey;
+    lastVirtualizationRef.current = virtualizationActive;
+
+    if (!virtualizationActive) {
+      slotAssignmentsRef.current = participants;
+      hiddenStateRef.current = [];
+      rangeStartRef.current = 0;
+      rangeEndRef.current = totalParticipants;
+      return;
+    }
+
+    if (totalParticipants === 0) {
+      slotAssignmentsRef.current = [];
+      hiddenStateRef.current = [];
+      rangeStartRef.current = 0;
+      rangeEndRef.current = 0;
+      return;
+    }
+
+    const initialAssignments = Array.from({ length: slotCount }, (_, index) => {
+      const participantIndex = index % totalParticipants;
+      return participants[participantIndex];
+    });
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSlotAssignments(initialAssignments);
+    slotAssignmentsRef.current = initialAssignments;
+    hiddenStateRef.current = new Array(slotCount).fill(false);
+    rangeStartRef.current = 0;
+    rangeEndRef.current = slotCount % totalParticipants;
+  }, [
+    participants,
+    participantsKey,
+    slotCount,
+    totalParticipants,
+    virtualizationActive,
+  ]);
 
   useEffect(() => {
     if (!isSpinning || participants.length === 0) {
@@ -86,6 +173,152 @@ export function Carousel3D({
     };
   }, [anglePerCard, isSpinning, participants, winnerId]);
 
+  const radius = 320;
+  const maxVisibleStep = slotCount > 7 ? 3 : slotCount / 2;
+  const fadeWidthInSteps = slotCount > 7 ? 0.5 : 0;
+
+  const cardsSource =
+    virtualizationActive && slotAssignments.length === slotCount
+      ? slotAssignments
+      : virtualizationActive
+      ? participants.slice(0, slotCount)
+      : participants;
+
+  const hiddenStateTemplate = useMemo(
+    () =>
+      virtualizationActive
+        ? Array.from({ length: slotCount }, () => false)
+        : [],
+    [slotCount, virtualizationActive]
+  );
+
+  const currentHiddenStates = hiddenStateTemplate.slice();
+
+  const cardElements = cardsSource.map((participant, slotIndex) => {
+    const isActive = winnerId === participant.id && !isSpinning;
+    const depth = radius + (isActive ? 30 : 0);
+    let opacityValue = isActive ? 1 : 0.6;
+
+    if (anglePerCard > 0) {
+      const cardAngle = slotIndex * anglePerCard + rotation;
+      let normalizedAngle = ((cardAngle % 360) + 360) % 360;
+      if (normalizedAngle > 180) {
+        normalizedAngle -= 360;
+      }
+
+      const stepsFromFront = Math.abs(normalizedAngle) / anglePerCard;
+
+      if (slotCount > 7 && stepsFromFront > maxVisibleStep + fadeWidthInSteps) {
+        opacityValue = 0;
+      } else if (
+        slotCount > 7 &&
+        fadeWidthInSteps > 0 &&
+        stepsFromFront > maxVisibleStep
+      ) {
+        const fadeProgress = Math.min(
+          (stepsFromFront - maxVisibleStep) / fadeWidthInSteps,
+          1
+        );
+        opacityValue *= 1 - fadeProgress;
+      }
+    }
+
+    const finalOpacity = Math.max(0, opacityValue);
+    const isEffectivelyHidden = finalOpacity <= 0.01;
+
+    if (virtualizationActive && slotIndex < currentHiddenStates.length) {
+      currentHiddenStates[slotIndex] = isEffectivelyHidden;
+    }
+
+    return (
+      <div
+        key={virtualizationActive ? `slot-${slotIndex}` : participant.id}
+        className="absolute left-1/2 top-1/2 w-64 -translate-x-1/2 -translate-y-1/2"
+        style={{
+          transform: `rotateY(${slotIndex * anglePerCard}deg) translateZ(${depth}px)`,
+          opacity: finalOpacity,
+          visibility: isEffectivelyHidden ? "hidden" : "visible",
+          transition: "opacity 300ms ease",
+        }}
+      >
+        <Card participant={participant} isActive={isActive} />
+      </div>
+    );
+  });
+
+  const hiddenSignature = virtualizationActive
+    ? currentHiddenStates.map((value) => (value ? "1" : "0")).join("")
+    : "";
+
+  useEffect(() => {
+    if (!virtualizationActive || totalParticipants === 0) {
+      hiddenStateRef.current = virtualizationActive
+        ? new Array(slotCount).fill(false)
+        : [];
+      return;
+    }
+
+    if (slotAssignmentsRef.current.length !== slotCount) {
+      return;
+    }
+
+    const previousHidden = hiddenStateRef.current;
+    const updatedAssignments = [...slotAssignmentsRef.current];
+    const latestHiddenStates = currentHiddenStates;
+    let hasChanges = false;
+
+    for (let index = 0; index < slotCount; index += 1) {
+      const wasHidden = previousHidden[index] ?? false;
+      const isHidden = latestHiddenStates[index] ?? false;
+
+      if (isHidden && !wasHidden) {
+        const direction = rotationDirectionRef.current;
+
+        if (direction === "forward") {
+          const participantIndex = rangeEndRef.current;
+          const participant = participants[participantIndex];
+
+          if (participant) {
+            updatedAssignments[index] = participant;
+            rangeStartRef.current =
+              (rangeStartRef.current + 1) % totalParticipants;
+            rangeEndRef.current =
+              (rangeEndRef.current + 1) % totalParticipants;
+            hasChanges = true;
+          }
+        } else {
+          rangeStartRef.current =
+            (rangeStartRef.current - 1 + totalParticipants) %
+            totalParticipants;
+          rangeEndRef.current =
+            (rangeEndRef.current - 1 + totalParticipants) % totalParticipants;
+
+          const participantIndex = rangeStartRef.current;
+          const participant = participants[participantIndex];
+
+          if (participant) {
+            updatedAssignments[index] = participant;
+            hasChanges = true;
+          }
+        }
+      }
+    }
+
+    if (hasChanges) {
+      slotAssignmentsRef.current = updatedAssignments;
+      setSlotAssignments(updatedAssignments);
+    }
+
+    hiddenStateRef.current = [...latestHiddenStates];
+  }, [
+    hiddenSignature,
+    currentHiddenStates,
+    participants,
+    slotCount,
+    totalParticipants,
+    virtualizationActive,
+  ]);
+
   if (participants.length === 0) {
     return (
       <div className="flex h-96 w-full items-center justify-center rounded-3xl border border-white/10 bg-white/5 text-sm text-zinc-300">
@@ -93,11 +326,6 @@ export function Carousel3D({
       </div>
     );
   }
-
-  const radius = 320;
-  const totalParticipants = participants.length;
-  const maxVisibleStep = totalParticipants <= 7 ? totalParticipants / 2 : 3;
-  const fadeWidthInSteps = totalParticipants <= 7 ? 0 : 0.5;
 
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-visible">
@@ -113,50 +341,7 @@ export function Carousel3D({
             transform: `rotateX(18deg) rotateY(${rotation}deg)`
           }}
         >
-          {participants.map((participant, index) => {
-            const isActive = winnerId === participant.id && !isSpinning;
-            const depth = radius + (isActive ? 30 : 0);
-            let opacityValue = isActive ? 1 : 0.6;
-
-            if (totalParticipants > 7 && anglePerCard > 0) {
-              const cardAngle = index * anglePerCard + rotation;
-              let normalizedAngle = ((cardAngle % 360) + 360) % 360;
-              if (normalizedAngle > 180) {
-                normalizedAngle -= 360;
-              }
-
-              const stepsFromFront = Math.abs(normalizedAngle) / anglePerCard;
-
-              if (stepsFromFront > maxVisibleStep + fadeWidthInSteps) {
-                opacityValue = 0;
-              } else if (stepsFromFront > maxVisibleStep) {
-                const fadeProgress = Math.min(
-                  (stepsFromFront - maxVisibleStep) / fadeWidthInSteps,
-                  1
-                );
-                opacityValue *= 1 - fadeProgress;
-              }
-            }
-
-            const finalOpacity = Math.max(0, opacityValue);
-            const isEffectivelyHidden =
-              totalParticipants > 7 && finalOpacity <= 0.01;
-
-            return (
-              <div
-                key={participant.id}
-                className="absolute left-1/2 top-1/2 w-64 -translate-x-1/2 -translate-y-1/2"
-                style={{
-                  transform: `rotateY(${index * anglePerCard}deg) translateZ(${depth}px)`,
-                  opacity: finalOpacity,
-                  visibility: isEffectivelyHidden ? "hidden" : "visible",
-                  transition: "opacity 300ms ease",
-                }}
-              >
-                <Card participant={participant} isActive={isActive} />
-              </div>
-            );
-          })}
+          {cardElements}
         </div>
       </div>
       <div className="absolute inset-0 rounded-[48px] border border-white/10" />

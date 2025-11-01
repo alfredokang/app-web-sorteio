@@ -47,21 +47,20 @@ export interface UseFormReturn<TFieldValues extends FieldValues> {
   register: (
     name: keyof TFieldValues,
     options?: RegisterOptions<TFieldValues>
-    ) => {
-      name: string;
-      onChange: (event: unknown) => void;
-      onBlur: () => void;
-      ref: (element: HTMLInputElement | null) => void;
-      defaultValue: TFieldValues[keyof TFieldValues] | undefined;
-    };
+  ) => {
+    name: string;
+    onChange: (event: unknown) => void;
+    onBlur: () => void;
+    ref: (element: HTMLInputElement | null) => void;
+    defaultValue: TFieldValues[keyof TFieldValues] | undefined;
+  };
   handleSubmit: (
     onValid: (values: TFieldValues) => void | Promise<void>
   ) => (event?: FormEvent<HTMLFormElement>) => Promise<void>;
-    reset: (values?: Partial<TFieldValues>) => void;
-    watch: (name?: keyof TFieldValues) =>
-      | TFieldValues[keyof TFieldValues]
-      | TFieldValues
-      | undefined;
+  reset: (values?: Partial<TFieldValues>) => void;
+  watch: (
+    name?: keyof TFieldValues
+  ) => TFieldValues[keyof TFieldValues] | TFieldValues | undefined;
   formState: {
     errors: Partial<Record<keyof TFieldValues, FieldError>>;
     touchedFields: Partial<Record<keyof TFieldValues, boolean>>;
@@ -72,7 +71,11 @@ export interface UseFormReturn<TFieldValues extends FieldValues> {
 }
 
 function extractValue(eventOrValue: unknown) {
-  if (eventOrValue && typeof eventOrValue === "object" && "target" in eventOrValue) {
+  if (
+    eventOrValue &&
+    typeof eventOrValue === "object" &&
+    "target" in eventOrValue
+  ) {
     const { target } = eventOrValue as { target: HTMLInputElement };
     if (target.type === "checkbox") {
       return target.checked;
@@ -85,10 +88,12 @@ function extractValue(eventOrValue: unknown) {
 export function useForm<TFieldValues extends FieldValues = FieldValues>(
   props: UseFormProps<TFieldValues> = {}
 ): UseFormReturn<TFieldValues> {
-  const valuesRef = useRef<TFieldValues>({ ...(props.defaultValues as TFieldValues) });
-  const fieldConfigsRef = useRef<Map<keyof TFieldValues, InternalFieldConfig<TFieldValues>>>(
-    new Map()
-  );
+  const valuesRef = useRef<TFieldValues>({
+    ...(props.defaultValues as TFieldValues),
+  });
+  const fieldConfigsRef = useRef<
+    Map<keyof TFieldValues, InternalFieldConfig<TFieldValues>>
+  >(new Map());
 
   const [errors, setErrors] = useState<
     Partial<Record<keyof TFieldValues, FieldError>>
@@ -110,8 +115,10 @@ export function useForm<TFieldValues extends FieldValues = FieldValues>(
       }
 
       const { options } = config;
-      const messageFor = (defaultMessage: string, customMessage?: string | boolean) =>
-        typeof customMessage === "string" ? customMessage : defaultMessage;
+      const messageFor = (
+        defaultMessage: string,
+        customMessage?: string | boolean
+      ) => (typeof customMessage === "string" ? customMessage : defaultMessage);
 
       if (options.required) {
         const isEmpty =
@@ -202,7 +209,8 @@ export function useForm<TFieldValues extends FieldValues = FieldValues>(
       if (!(name in valuesRef.current) && props.defaultValues) {
         const defaultValue = props.defaultValues[name];
         if (defaultValue !== undefined) {
-          valuesRef.current[name] = defaultValue as TFieldValues[keyof TFieldValues];
+          valuesRef.current[name] =
+            defaultValue as TFieldValues[keyof TFieldValues];
         }
       }
 
@@ -210,7 +218,9 @@ export function useForm<TFieldValues extends FieldValues = FieldValues>(
         name: name as string,
         defaultValue: valuesRef.current[name],
         onChange: (event: unknown) => {
-          const newValue = extractValue(event) as TFieldValues[keyof TFieldValues];
+          const newValue = extractValue(
+            event
+          ) as TFieldValues[keyof TFieldValues];
           valuesRef.current[name] = newValue;
           const error = validateField(name, newValue);
           setFieldError(name, error);
@@ -264,14 +274,19 @@ export function useForm<TFieldValues extends FieldValues = FieldValues>(
     [validateField]
   );
 
-  const reset = useCallback<UseFormReturn<TFieldValues>["reset"]>((values) => {
-    valuesRef.current = {
-      ...(values ? (values as TFieldValues) : (props.defaultValues as TFieldValues)),
-    } as TFieldValues;
-    setErrors({});
-    setTouched({});
-    setIsSubmitted(false);
-  }, [props.defaultValues]);
+  const reset = useCallback<UseFormReturn<TFieldValues>["reset"]>(
+    (values) => {
+      valuesRef.current = {
+        ...(values
+          ? (values as TFieldValues)
+          : (props.defaultValues as TFieldValues)),
+      } as TFieldValues;
+      setErrors({});
+      setTouched({});
+      setIsSubmitted(false);
+    },
+    [props.defaultValues]
+  );
 
   const watch = useCallback<UseFormReturn<TFieldValues>["watch"]>(
     (name?: keyof TFieldValues) => {

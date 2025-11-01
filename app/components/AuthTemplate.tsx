@@ -7,7 +7,12 @@ interface AuthTemplateProps {
   footer: ReactNode;
 }
 
-export function AuthTemplate({ title, subtitle, children, footer }: AuthTemplateProps) {
+export function AuthTemplate({
+  title,
+  subtitle,
+  children,
+  footer,
+}: AuthTemplateProps) {
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-24">
       <div className="pointer-events-none absolute inset-0">
@@ -21,12 +26,14 @@ export function AuthTemplate({ title, subtitle, children, footer }: AuthTemplate
           <span className="inline-flex items-center rounded-full border border-white/10 bg-white/10 px-4 py-1 text-xs font-semibold tracking-[0.3em] text-white/70 uppercase">
             Bem-vindo
           </span>
-          <h1 className="mt-6 text-3xl font-semibold text-white md:text-4xl">{title}</h1>
+          <h1 className="mt-6 text-3xl font-semibold text-white md:text-4xl">
+            {title}
+          </h1>
           <p className="mt-3 text-base text-white/70 md:text-lg">{subtitle}</p>
         </div>
 
-        <div className="relative rounded-[32px] border border-white/15 bg-white/10 p-8 shadow-[0_35px_60px_rgba(2,6,23,0.45)] backdrop-blur-2xl sm:p-10">
-          <div className="absolute inset-0 rounded-[32px] border border-white/10 bg-gradient-to-br from-white/15 via-white/8 to-white/5 opacity-90" />
+        <div className="relative rounded-4xl border border-white/15 bg-white/10 p-8 shadow-[0_35px_60px_rgba(2,6,23,0.45)] backdrop-blur-2xl sm:p-10">
+          <div className="absolute inset-0 rounded-4xl border border-white/10 bg-linear-to-br from-white/15 via-white/8 to-white/5 opacity-90" />
           <div className="relative space-y-8">{children}</div>
         </div>
 

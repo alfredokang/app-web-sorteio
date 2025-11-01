@@ -16,7 +16,8 @@ type SignUpFormValues = {
 const emailPattern =
   /^(?:[a-zA-Z0-9_'^&+{}-]+(?:\.[a-zA-Z0-9_'^&+{}-]+)*|"(?:[^"\\]|\\.)+")@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
 
-const phonePattern = /^(\+?\d{1,3}[\s-]?)?(\(?\d{2,3}\)?[\s-]?)?\d{4,5}[\s-]?\d{4}$/;
+const phonePattern =
+  /^(\+?\d{1,3}[\s-]?)?(\(?\d{2,3}\)?[\s-]?)?\d{4,5}[\s-]?\d{4}$/;
 
 export default function SignUpPage() {
   const [message, setMessage] = useState<string | null>(null);
@@ -36,7 +37,7 @@ export default function SignUpPage() {
   });
 
   // eslint-disable-next-line react-hooks/incompatible-library
-  const passwordValue = watch("password");
+  const passwordValue = watch("password") as string;
 
   const passwordStrength = useMemo(() => {
     if (!passwordValue) return 0;
@@ -56,7 +57,11 @@ export default function SignUpPage() {
   const renderPasswordStrength = () => {
     const labels = ["Muito fraca", "Fraca", "Boa", "Forte"];
     if (!passwordValue) {
-      return <p className="text-xs text-white/50">Use letras, números e símbolos para criar uma senha forte.</p>;
+      return (
+        <p className="text-xs text-white/50">
+          Use letras, números e símbolos para criar uma senha forte.
+        </p>
+      );
     }
 
     const normalized = Math.min(Math.max(passwordStrength, 1), labels.length);
@@ -85,7 +90,10 @@ export default function SignUpPage() {
       footer={
         <p>
           Já tem uma conta?{" "}
-          <Link href="/login" className="font-semibold text-sky-300 hover:text-sky-200">
+          <Link
+            href="/login"
+            className="font-semibold text-sky-300 hover:text-sky-200"
+          >
             Fazer login
           </Link>
         </p>
@@ -94,7 +102,10 @@ export default function SignUpPage() {
       <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="space-y-2 sm:col-span-2">
-            <label className="text-sm font-medium text-white/80" htmlFor="fullName">
+            <label
+              className="text-sm font-medium text-white/80"
+              htmlFor="fullName"
+            >
               Nome completo
             </label>
             <input
@@ -117,7 +128,10 @@ export default function SignUpPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-white/80" htmlFor="phone">
+            <label
+              className="text-sm font-medium text-white/80"
+              htmlFor="phone"
+            >
               Celular
             </label>
             <input
@@ -141,7 +155,10 @@ export default function SignUpPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-white/80" htmlFor="email">
+            <label
+              className="text-sm font-medium text-white/80"
+              htmlFor="email"
+            >
               E-mail corporativo
             </label>
             <input
@@ -167,7 +184,10 @@ export default function SignUpPage() {
 
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-white/80" htmlFor="password">
+            <label
+              className="text-sm font-medium text-white/80"
+              htmlFor="password"
+            >
               Senha
             </label>
             <input
@@ -191,7 +211,10 @@ export default function SignUpPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-white/80" htmlFor="confirmPassword">
+            <label
+              className="text-sm font-medium text-white/80"
+              htmlFor="confirmPassword"
+            >
               Confirmar senha
             </label>
             <input
@@ -206,15 +229,18 @@ export default function SignUpPage() {
               })}
               aria-invalid={Boolean(errors.confirmPassword)}
             />
-            {errors.confirmPassword && (touchedFields.confirmPassword || isSubmitted) && (
-              <p className="text-sm text-rose-300">{errors.confirmPassword.message}</p>
-            )}
+            {errors.confirmPassword &&
+              (touchedFields.confirmPassword || isSubmitted) && (
+                <p className="text-sm text-rose-300">
+                  {errors.confirmPassword.message}
+                </p>
+              )}
           </div>
         </div>
 
         <button
           type="submit"
-          className="flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 px-6 py-3 text-base font-semibold text-white shadow-[0_15px_35px_rgba(37,99,235,0.35)] transition hover:shadow-[0_20px_45px_rgba(59,130,246,0.45)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-200 disabled:cursor-not-allowed disabled:opacity-70"
+          className="flex w-full items-center justify-center rounded-2xl bg-linear-to-r from-sky-500 via-indigo-500 to-purple-500 px-6 py-3 text-base font-semibold text-white shadow-[0_15px_35px_rgba(37,99,235,0.35)] transition hover:shadow-[0_20px_45px_rgba(59,130,246,0.45)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-200 disabled:cursor-not-allowed disabled:opacity-70"
           disabled={isSubmitting}
         >
           {isSubmitting ? "Criando acesso..." : "Concluir cadastro"}

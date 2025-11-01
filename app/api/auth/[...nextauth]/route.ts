@@ -46,9 +46,7 @@ export const authOptions = {
             ? credentials.email.trim().toLowerCase()
             : "";
         const password =
-          typeof credentials?.password === "string"
-            ? credentials.password
-            : "";
+          typeof credentials?.password === "string" ? credentials.password : "";
 
         if (!email || !password) {
           return null;

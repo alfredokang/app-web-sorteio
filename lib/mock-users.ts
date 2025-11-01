@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import bcrypt from "bcryptjs";
+import * as bcrypt from "bcrypt-ts";
 
 export interface MockUser {
   id: string;

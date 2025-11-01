@@ -55,15 +55,20 @@ export default function SignUpPage() {
     setMessage(null);
 
     try {
+      const trimmedFullName = values.fullName.trim();
+      const trimmedPhone = values.phone.trim();
+      const trimmedEmail = values.email.trim();
+      const normalizedEmail = trimmedEmail.toLowerCase();
+
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          fullName: values.fullName,
-          phone: values.phone,
-          email: values.email,
+          fullName: trimmedFullName,
+          phone: trimmedPhone,
+          email: normalizedEmail,
           password: values.password,
         }),
       });
@@ -75,7 +80,7 @@ export default function SignUpPage() {
       }
 
       setMessage(
-        `Cadastro criado para ${values.fullName.split(" ")[0]}! Você já pode fazer login.`
+        `Cadastro criado para ${trimmedFullName.split(" ")[0]}! Você já pode fazer login.`
       );
       reset({
         fullName: "",

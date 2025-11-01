@@ -46,8 +46,10 @@ export default function LoginPage() {
     setMessage(null);
 
     const destination = `${callbackUrl}${callbackSearch}`;
+    const trimmedEmail = values.email.trim();
+    const normalizedEmail = trimmedEmail.toLowerCase();
     const result = await signIn("credentials", {
-      email: values.email,
+      email: normalizedEmail,
       password: values.password,
       redirect: false,
       callbackUrl: destination,
@@ -58,7 +60,7 @@ export default function LoginPage() {
       return;
     }
 
-    setMessage(`Bem-vindo de volta, ${values.email}!`);
+    setMessage(`Bem-vindo de volta, ${trimmedEmail}!`);
     router.replace(result.url ?? destination);
     router.refresh();
   };

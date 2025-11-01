@@ -40,14 +40,20 @@ const authConfig = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
+        const email =
+          typeof credentials?.email === "string"
+            ? credentials.email.trim().toLowerCase()
+            : "";
+        const password =
+          typeof credentials?.password === "string"
+            ? credentials.password
+            : "";
+
+        if (!email || !password) {
           return null;
         }
 
-        const user = await verifyUserCredentials(
-          credentials.email,
-          credentials.password
-        );
+        const user = await verifyUserCredentials(email, password);
 
         if (!user) {
           return null;

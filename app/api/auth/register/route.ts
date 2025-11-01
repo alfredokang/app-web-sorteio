@@ -4,16 +4,23 @@ import { createMockUser, getUserByEmail } from "@/lib/mock-users";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { fullName, email, password, phone } = body ?? {};
+    const rawFullName =
+      typeof body?.fullName === "string" ? body.fullName.trim() : undefined;
+    const rawEmail = typeof body?.email === "string" ? body.email.trim() : "";
+    const rawPassword =
+      typeof body?.password === "string" ? body.password : "";
+    const rawPhone = typeof body?.phone === "string" ? body.phone.trim() : undefined;
 
-    if (!email || !password) {
+    if (!rawEmail || !rawPassword) {
       return NextResponse.json(
         { error: "E-mail e senha são obrigatórios." },
         { status: 400 }
       );
     }
 
-    const existingUser = getUserByEmail(email);
+    const normalizedEmail = rawEmail.toLowerCase();
+
+    const existingUser = getUserByEmail(normalizedEmail);
     if (existingUser) {
       return NextResponse.json(
         { error: "Este e-mail já está cadastrado." },
@@ -22,10 +29,10 @@ export async function POST(request: Request) {
     }
 
     const user = await createMockUser({
-      email,
-      password,
-      fullName,
-      phone,
+      email: normalizedEmail,
+      password: rawPassword,
+      fullName: rawFullName,
+      phone: rawPhone,
       isAuthorized: true,
     });
 

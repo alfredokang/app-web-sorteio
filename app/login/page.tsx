@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { signIn, useSession } from "next-auth/react";
 import { AuthTemplate } from "../components/AuthTemplate";
 import { useForm } from "react-hook-form";
 
@@ -15,6 +17,12 @@ const emailPattern =
 
 export default function LoginPage() {
   const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { status } = useSession();
+  const callbackUrl = searchParams.get("callbackUrl") ?? "/";
+  const callbackSearch = searchParams.get("callbackSearch") ?? "";
   const {
     register,
     handleSubmit,
@@ -26,9 +34,33 @@ export default function LoginPage() {
     },
   });
 
+  useEffect(() => {
+    if (status === "authenticated") {
+      const destination = `${callbackUrl}${callbackSearch}`;
+      router.replace(destination);
+    }
+  }, [status, callbackUrl, callbackSearch, router]);
+
   const onSubmit = async (values: LoginFormValues) => {
-    await new Promise((resolve) => setTimeout(resolve, 600));
+    setError(null);
+    setMessage(null);
+
+    const destination = `${callbackUrl}${callbackSearch}`;
+    const result = await signIn("credentials", {
+      email: values.email,
+      password: values.password,
+      redirect: false,
+      callbackUrl: destination,
+    });
+
+    if (!result || result.error) {
+      setError("E-mail ou senha inválidos.");
+      return;
+    }
+
     setMessage(`Bem-vindo de volta, ${values.email}!`);
+    router.replace(result.url ?? destination);
+    router.refresh();
   };
 
   return (
@@ -105,6 +137,12 @@ export default function LoginPage() {
         >
           {isSubmitting ? "Entrando..." : "Entrar"}
         </button>
+
+        {error && (
+          <div className="rounded-2xl border border-rose-400/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+            {error}
+          </div>
+        )}
 
         {message && (
           <div className="rounded-2xl border border-emerald-400/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">

@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "react-hook-form": ["./lib/react-hook-form"]
     }
   },
   "include": [

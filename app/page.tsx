@@ -224,7 +224,7 @@ export default function Home() {
       ? "bg-slate-900 text-white shadow-[0_8px_20px_rgba(15,23,42,0.45)]"
       : isResetAvailable
       ? "bg-white/90 text-slate-900 shadow-[0_14px_30px_rgba(16,185,129,0.35)] group-hover:bg-white"
-      : "bg-slate-900 text-white shadow-[0_12px_30px_rgba(15,23,42,0.4)] group-hover:bg-slate-800"
+      : "bg-slate-900 text-white shadow-[0_12px_30px_rgba(15,23,42,0.4)] group-hover:bg-slate-800",
   ].join(" ");
 
   return (

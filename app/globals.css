@@ -52,3 +52,83 @@ body {
     opacity: 0;
   }
 }
+
+.floating-card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: block;
+  min-width: 150px;
+  max-width: 220px;
+  transform: translate3d(var(--translate-x), var(--translate-y), 0)
+    scale(var(--scale)) rotate(var(--rotate));
+  opacity: var(--initial-opacity);
+  animation-name: participant-float;
+  animation-duration: var(--float-duration);
+  animation-delay: var(--float-delay);
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-fill-mode: both;
+  animation-timing-function: ease-in-out;
+  will-change: transform, opacity;
+}
+
+.floating-card[data-converging="true"] {
+  animation-name: participant-converge;
+  animation-duration: 1s;
+  animation-delay: 0s;
+  animation-iteration-count: 1;
+  animation-direction: normal;
+  animation-fill-mode: forwards;
+  animation-timing-function: cubic-bezier(0.33, 0, 0.14, 1);
+}
+
+.floating-card-inner {
+  display: flex;
+  width: 100%;
+  border-radius: 18px;
+  border: 1px solid hsl(var(--hue) 75% 68% / 0.35);
+  padding: 12px 14px;
+  background:
+    linear-gradient(135deg, hsl(var(--hue) 80% 68% / 0.28), rgba(15, 23, 42, 0.65));
+  box-shadow: 0 18px 42px rgba(2, 6, 23, 0.55);
+  backdrop-filter: blur(16px);
+}
+
+@keyframes participant-float {
+  0% {
+    transform: translate3d(
+        calc(var(--translate-x) - var(--float-x)),
+        calc(var(--translate-y) - var(--float-y)),
+        0
+      )
+      scale(var(--scale)) rotate(var(--rotate));
+    opacity: var(--initial-opacity);
+  }
+  50% {
+    transform: translate3d(var(--translate-x), var(--translate-y), 0)
+      scale(var(--scale-mid)) rotate(var(--rotate));
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(
+        calc(var(--translate-x) + var(--float-x)),
+        calc(var(--translate-y) + var(--float-y)),
+        0
+      )
+      scale(var(--scale)) rotate(var(--rotate));
+    opacity: var(--initial-opacity);
+  }
+}
+
+@keyframes participant-converge {
+  0% {
+    transform: translate3d(var(--translate-x), var(--translate-y), 0)
+      scale(var(--scale)) rotate(var(--rotate));
+    opacity: var(--initial-opacity);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(0.45) rotate(0deg);
+    opacity: 0;
+  }
+}

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Carousel3D } from "./components/Carousel3D";
 import { ConfettiOverlay } from "./components/ConfettiOverlay";
+import { FloatingParticipants } from "./components/FloatingParticipants";
 import { Participant } from "./components/types";
 
 const MOCK_PARTICIPANTS: Participant[] = [
@@ -102,7 +103,11 @@ export default function Home() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [seed, setSeed] = useState(() => Math.floor(Math.random() * 100000));
   const [hasResult, setHasResult] = useState(false);
+  const [hasIntroPlayed, setHasIntroPlayed] = useState(false);
+  const [isCarouselVisible, setIsCarouselVisible] = useState(false);
+  const [isCloudConverging, setIsCloudConverging] = useState(false);
   const spinTimeout = useRef<NodeJS.Timeout | null>(null);
+  const revealTimeout = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const loadTimeout = setTimeout(() => {
@@ -124,6 +129,9 @@ export default function Home() {
       if (spinTimeout.current) {
         clearTimeout(spinTimeout.current);
       }
+      if (revealTimeout.current) {
+        clearTimeout(revealTimeout.current);
+      }
     };
   }, []);
 
@@ -133,6 +141,9 @@ export default function Home() {
   );
 
   const isButtonDisabled = isSpinning || !participants.length || !winnerId;
+
+  const shouldShowCloud =
+    (!hasIntroPlayed && participants.length > 0) || isCloudConverging;
 
   const handleStart = () => {
     if (isButtonDisabled) {
@@ -146,6 +157,22 @@ export default function Home() {
     setHasResult(false);
     setSeed(Math.floor(Math.random() * 100000));
     setIsSpinning(true);
+
+    if (!hasIntroPlayed) {
+      setIsCloudConverging(true);
+
+      if (revealTimeout.current) {
+        clearTimeout(revealTimeout.current);
+      }
+
+      revealTimeout.current = setTimeout(() => {
+        setIsCloudConverging(false);
+        setHasIntroPlayed(true);
+        setIsCarouselVisible(true);
+      }, 1100);
+    } else {
+      setIsCarouselVisible(true);
+    }
 
     spinTimeout.current = setTimeout(() => {
       setIsSpinning(false);
@@ -194,12 +221,28 @@ export default function Home() {
 
         <section className="mt-16 flex flex-col items-center gap-10">
           <div className="w-full max-w-4xl">
-            <Carousel3D
-              participants={participants}
-              isSpinning={isSpinning}
-              winnerId={winnerId}
-              spinDuration={SPIN_DURATION}
-            />
+            <div className="relative w-full min-h-[420px]">
+              <div
+                className={`h-full w-full transition-all duration-700 ease-out ${
+                  isCarouselVisible
+                    ? "opacity-100 translate-y-0"
+                    : "pointer-events-none opacity-0 translate-y-6"
+                }`}
+              >
+                <Carousel3D
+                  participants={participants}
+                  isSpinning={isSpinning}
+                  winnerId={winnerId}
+                  spinDuration={SPIN_DURATION}
+                />
+              </div>
+
+              <FloatingParticipants
+                participants={participants}
+                isVisible={shouldShowCloud}
+                isConverging={isCloudConverging}
+              />
+            </div>
           </div>
 
           {winner && (

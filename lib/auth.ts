@@ -1,20 +1,14 @@
 import type { NextAuthOptions, Session } from "next-auth";
 import { getServerSession as nextGetServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
 
-import {
-  ensureMockUser,
-  findUserByEmail,
-  MOCK_USER_EMAIL,
-  MOCK_USER_PASSWORD,
-  toPublicUser,
-} from "@/lib/mockdb";
-
-function isMockEnabled(): boolean {
-  const value = String(process.env.ENABLE_MOCK ?? "false").toLowerCase();
-  return value === "true" || value === "1";
-}
+export const MOCK_USER = {
+  id: "mock-1",
+  name: "Usuário Mock",
+  email: "mock@example.com",
+  password: "Mock@1234",
+  isAuthorized: true,
+} as const;
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -38,47 +32,19 @@ export const authOptions: NextAuthOptions = {
         const email = credentials.email.trim().toLowerCase();
         const password = credentials.password;
 
-        if (isMockEnabled() && email === MOCK_USER_EMAIL) {
-          if (password !== MOCK_USER_PASSWORD) {
-            throw new Error("Senha incorreta para o usuário mock.");
-          }
-
-          const mockUser = await ensureMockUser();
-          const publicUser = toPublicUser(mockUser);
-
+        if (
+          email === MOCK_USER.email.toLowerCase() &&
+          password === MOCK_USER.password
+        ) {
           return {
-            id: publicUser.id,
-            name: publicUser.name,
-            email: publicUser.email,
-            isAuthorized: publicUser.isAuthorized,
+            id: MOCK_USER.id,
+            name: MOCK_USER.name,
+            email: MOCK_USER.email,
+            isAuthorized: MOCK_USER.isAuthorized,
           };
         }
 
-        if (email === MOCK_USER_EMAIL) {
-          throw new Error("O usuário mock está desativado neste ambiente.");
-        }
-
-        const storedUser = await findUserByEmail(email);
-
-        if (!storedUser) {
-          throw new Error("Credenciais inválidas.");
-        }
-
-        const isPasswordValid = await bcrypt.compare(
-          password,
-          storedUser.passwordHash,
-        );
-
-        if (!isPasswordValid) {
-          throw new Error("Credenciais inválidas.");
-        }
-
-        return {
-          id: storedUser.id,
-          name: storedUser.name,
-          email: storedUser.email,
-          isAuthorized: storedUser.isAuthorized,
-        };
+        throw new Error("Credenciais inválidas para este ambiente.");
       },
     }),
   ],
@@ -98,6 +64,17 @@ export const authOptions: NextAuthOptions = {
       }
 
       return session;
+    },
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith("/")) {
+        return `${baseUrl}${url}`;
+      }
+
+      if (new URL(url).origin === baseUrl) {
+        return url;
+      }
+
+      return baseUrl;
     },
   },
   debug: process.env.NODE_ENV === "development",
@@ -120,4 +97,3 @@ export async function requireAuthorizedSession(): Promise<Session> {
 
   return session;
 }
-

@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
-import { useState } from "react";
 import { AuthTemplate } from "../components/AuthTemplate";
 import { useForm } from "react-hook-form";
 
@@ -15,7 +15,8 @@ const emailPattern =
   /^(?:[a-zA-Z0-9_'^&+{}-]+(?:\.[a-zA-Z0-9_'^&+{}-]+)*|"(?:[^"\\]|\\.)+")@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
 
 export default function LoginPage() {
-  const { data: session } = useSession();
+  const router = useRouter();
+  const { data: session, status } = useSession();
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const {
@@ -53,24 +54,21 @@ export default function LoginPage() {
       return;
     }
 
-    setMessage("Login realizado com sucesso! Você já pode acessar o painel.");
+    setMessage("Login realizado com sucesso! Redirecionando...");
+    router.replace("/");
+    router.refresh();
   };
+
+  useEffect(() => {
+    if (status === "authenticated" && session?.user.isAuthorized) {
+      router.replace("/");
+    }
+  }, [status, session?.user.isAuthorized, router]);
 
   return (
     <AuthTemplate
       title="Faça login para continuar"
-      subtitle="Acesse a área interna da equipe e acompanhe os próximos sorteios e relatórios."
-      footer={
-        <p>
-          Ainda não tem uma conta?{" "}
-          <Link
-            href="/signup"
-            className="font-semibold text-sky-300 hover:text-sky-200"
-          >
-            Criar cadastro
-          </Link>
-        </p>
-      }
+      subtitle="Use as credenciais fornecidas pela equipe para acessar a área interna."
     >
       <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-2">
@@ -130,6 +128,13 @@ export default function LoginPage() {
         >
           {isSubmitting ? "Entrando..." : "Entrar"}
         </button>
+
+        <div className="rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/80">
+          <p>
+            Utilize o e-mail <code className="font-mono text-white">mock@example.com</code> e a senha
+            <code className="ml-1 font-mono text-white">Mock@1234</code> para testar o fluxo completo.
+          </p>
+        </div>
 
         {message && (
           <div className="rounded-2xl border border-emerald-400/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">

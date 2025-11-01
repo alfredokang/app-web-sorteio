@@ -21,9 +21,11 @@ const phonePattern =
 
 export default function SignUpPage() {
   const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
+    reset,
     watch,
     formState: { errors, touchedFields, isSubmitting, isSubmitted },
   } = useForm<SignUpFormValues>({
@@ -50,8 +52,44 @@ export default function SignUpPage() {
   }, [passwordValue]);
 
   const onSubmit = async (values: SignUpFormValues) => {
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    setMessage(`Cadastro criado para ${values.fullName.split(" ")[0]}!`);
+    setMessage(null);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: values.fullName,
+          email: values.email,
+          password: values.password,
+          phone: values.phone,
+        }),
+      });
+
+      const data = (await response.json()) as { message?: string };
+
+      if (!response.ok) {
+        setError(
+          data?.message ??
+            "Não foi possível concluir o cadastro agora. Tente novamente mais tarde.",
+        );
+        return;
+      }
+
+      reset();
+      setMessage(
+        data?.message ??
+          "Cadastro criado com sucesso! Aguarde a liberação pela equipe.",
+      );
+    } catch (signupError) {
+      console.error(signupError);
+      setError(
+        "Erro inesperado ao comunicar com o servidor. Verifique sua conexão e tente novamente.",
+      );
+    }
   };
 
   const renderPasswordStrength = () => {
@@ -246,6 +284,11 @@ export default function SignUpPage() {
           {isSubmitting ? "Criando acesso..." : "Concluir cadastro"}
         </button>
 
+        {error && (
+          <div className="rounded-2xl border border-rose-400/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+            {error}
+          </div>
+        )}
         {message && (
           <div className="rounded-2xl border border-emerald-400/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
             {message}

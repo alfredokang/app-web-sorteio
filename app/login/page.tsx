@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { signIn, useSession } from "next-auth/react";
 import { useState } from "react";
 import { AuthTemplate } from "../components/AuthTemplate";
 import { useForm } from "react-hook-form";
@@ -14,7 +15,9 @@ const emailPattern =
   /^(?:[a-zA-Z0-9_'^&+{}-]+(?:\.[a-zA-Z0-9_'^&+{}-]+)*|"(?:[^"\\]|\\.)+")@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
 
 export default function LoginPage() {
+  const { data: session } = useSession();
   const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
@@ -27,8 +30,30 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (values: LoginFormValues) => {
-    await new Promise((resolve) => setTimeout(resolve, 600));
-    setMessage(`Bem-vindo de volta, ${values.email}!`);
+    setMessage(null);
+    setError(null);
+
+    const result = await signIn("credentials", {
+      email: values.email,
+      password: values.password,
+      redirect: false,
+    });
+
+    if (!result) {
+      setError("Não foi possível realizar o login agora. Tente novamente.");
+      return;
+    }
+
+    if (result.error) {
+      setError(
+        result.error === "CredentialsSignin"
+          ? "Não foi possível confirmar suas credenciais. Verifique os dados e tente novamente."
+          : result.error,
+      );
+      return;
+    }
+
+    setMessage("Login realizado com sucesso! Você já pode acessar o painel.");
   };
 
   return (
@@ -109,6 +134,24 @@ export default function LoginPage() {
         {message && (
           <div className="rounded-2xl border border-emerald-400/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
             {message}
+          </div>
+        )}
+        {error && (
+          <div className="rounded-2xl border border-rose-400/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+            {error}
+          </div>
+        )}
+        {session && (
+          <div className="rounded-2xl border border-sky-400/30 bg-sky-500/10 px-4 py-3 text-sm text-sky-100">
+            <p>
+              Sessão ativa para <strong>{session.user.email}</strong>.
+            </p>
+            <p>
+              Status de autorização:{" "}
+              {session.user.isAuthorized
+                ? "liberado para acessar as áreas internas."
+                : "aguardando aprovação da equipe."}
+            </p>
           </div>
         )}
       </form>

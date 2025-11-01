@@ -21,10 +21,12 @@ const phonePattern =
 
 export default function SignUpPage() {
   const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors, touchedFields, isSubmitting, isSubmitted },
   } = useForm<SignUpFormValues>({
     defaultValues: {
@@ -36,7 +38,6 @@ export default function SignUpPage() {
     },
   });
 
-  // eslint-disable-next-line react-hooks/incompatible-library
   const passwordValue = watch("password") as string;
 
   const passwordStrength = useMemo(() => {
@@ -50,8 +51,49 @@ export default function SignUpPage() {
   }, [passwordValue]);
 
   const onSubmit = async (values: SignUpFormValues) => {
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    setMessage(`Cadastro criado para ${values.fullName.split(" ")[0]}!`);
+    setError(null);
+    setMessage(null);
+
+    try {
+      const trimmedFullName = values.fullName.trim();
+      const trimmedPhone = values.phone.trim();
+      const trimmedEmail = values.email.trim();
+      const normalizedEmail = trimmedEmail.toLowerCase();
+
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName: trimmedFullName,
+          phone: trimmedPhone,
+          email: normalizedEmail,
+          password: values.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error ?? "Não foi possível concluir o cadastro.");
+      }
+
+      setMessage(
+        `Cadastro criado para ${trimmedFullName.split(" ")[0]}! Você já pode fazer login.`
+      );
+      reset({
+        fullName: "",
+        phone: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+      });
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Não foi possível concluir o cadastro.";
+      setError(errorMessage);
+    }
   };
 
   const renderPasswordStrength = () => {
@@ -245,6 +287,12 @@ export default function SignUpPage() {
         >
           {isSubmitting ? "Criando acesso..." : "Concluir cadastro"}
         </button>
+
+        {error && (
+          <div className="rounded-2xl border border-rose-400/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+            {error}
+          </div>
+        )}
 
         {message && (
           <div className="rounded-2xl border border-emerald-400/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">

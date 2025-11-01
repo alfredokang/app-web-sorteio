@@ -1,5 +1,6 @@
 "use client";
 
+import { signOut } from "next-auth/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Carousel3D } from "./components/Carousel3D";
 import { ConfettiOverlay } from "./components/ConfettiOverlay";
@@ -226,10 +227,20 @@ export default function Home() {
       ? "bg-white/90 text-slate-900 shadow-[0_14px_30px_rgba(16,185,129,0.35)] group-hover:bg-white"
       : "bg-slate-900 text-white shadow-[0_12px_30px_rgba(15,23,42,0.4)] group-hover:bg-slate-800",
   ].join(" ");
+  const handleLogout = () => {
+    signOut({ callbackUrl: "/login" });
+  };
 
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-hidden">
       <div className="pointer-events-none absolute -top-40 left-1/2 h-[640px] w-[640px] -translate-x-1/2 rounded-full bg-indigo-500/20 blur-3xl" />
+      <button
+        type="button"
+        onClick={handleLogout}
+        className="absolute right-6 top-6 z-30 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium text-white/70 backdrop-blur transition hover:bg-white/20 hover:text-white"
+      >
+        Sair
+      </button>
       <ConfettiOverlay isVisible={showConfetti} seed={seed} />
       <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col px-6 pb-24 pt-24">
         <header className="flex flex-col gap-6 text-center lg:text-left">

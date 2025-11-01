@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { signIn, useSession } from "next-auth/react";
 import { AuthTemplate } from "../components/AuthTemplate";
 import { useForm } from "react-hook-form";
 
@@ -15,6 +17,24 @@ const emailPattern =
 
 export default function LoginPage() {
   const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const { status } = useSession();
+  const authError = searchParams.get("error");
+  const callbackUrl = searchParams.get("callbackUrl") ?? "/";
+  const callbackSearch = searchParams.get("callbackSearch") ?? "";
+  const derivedAuthErrorMessage = useMemo(() => {
+    if (!authError) {
+      return null;
+    }
+
+    return authError === "CredentialsSignin"
+      ? "E-mail ou senha inválidos."
+      : "Não foi possível fazer login. Tente novamente.";
+  }, [authError]);
+  const activeError = error ?? derivedAuthErrorMessage;
   const {
     register,
     handleSubmit,
@@ -26,9 +46,53 @@ export default function LoginPage() {
     },
   });
 
+  useEffect(() => {
+    if (status === "authenticated") {
+      const destination = `${callbackUrl}${callbackSearch}`;
+      router.replace(destination);
+    }
+  }, [status, callbackUrl, callbackSearch, router]);
+
+  useEffect(() => {
+    if (!authError) {
+      return;
+    }
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("error");
+
+    const nextQuery = params.toString();
+    const nextUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname;
+    router.replace(nextUrl);
+  }, [authError, pathname, router, searchParams]);
+
   const onSubmit = async (values: LoginFormValues) => {
-    await new Promise((resolve) => setTimeout(resolve, 600));
-    setMessage(`Bem-vindo de volta, ${values.email}!`);
+    setError(null);
+    setMessage(null);
+
+    const destination = `${callbackUrl}${callbackSearch}`;
+    const trimmedEmail = values.email.trim();
+    const normalizedEmail = trimmedEmail.toLowerCase();
+    const result = await signIn("credentials", {
+      email: normalizedEmail,
+      password: values.password,
+      redirect: false,
+      callbackUrl: destination,
+    });
+
+    if (!result || result.error) {
+      const friendlyError =
+        result?.error === "CredentialsSignin"
+          ? "E-mail ou senha inválidos."
+          : "Não foi possível fazer login. Verifique seus dados e tente novamente.";
+      setError(friendlyError);
+      setMessage(null);
+      return;
+    }
+
+    setMessage(`Bem-vindo de volta, ${trimmedEmail}!`);
+    router.replace(result.url ?? destination);
+    router.refresh();
   };
 
   return (
@@ -105,6 +169,12 @@ export default function LoginPage() {
         >
           {isSubmitting ? "Entrando..." : "Entrar"}
         </button>
+
+        {activeError && (
+          <div className="rounded-2xl border border-rose-400/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+            {activeError}
+          </div>
+        )}
 
         {message && (
           <div className="rounded-2xl border border-emerald-400/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">

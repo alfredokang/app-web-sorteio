@@ -95,6 +95,17 @@ body {
   backdrop-filter: blur(16px);
 }
 
+.floating-card-comment {
+  display: -webkit-box;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  white-space: normal;
+  word-break: break-word;
+}
+
 @keyframes participant-float {
   0% {
     transform: translate3d(

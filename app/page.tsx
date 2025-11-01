@@ -145,6 +145,25 @@ export default function Home() {
   const shouldShowCloud =
     (!hasIntroPlayed && participants.length > 0) || isCloudConverging;
 
+  const handleReset = () => {
+    if (spinTimeout.current) {
+      clearTimeout(spinTimeout.current);
+      spinTimeout.current = null;
+    }
+    if (revealTimeout.current) {
+      clearTimeout(revealTimeout.current);
+      revealTimeout.current = null;
+    }
+
+    setIsSpinning(false);
+    setShowConfetti(false);
+    setHasResult(false);
+    setIsCarouselVisible(false);
+    setHasIntroPlayed(false);
+    setIsCloudConverging(false);
+    setSeed(Math.floor(Math.random() * 100000));
+  };
+
   const handleStart = () => {
     if (isButtonDisabled) {
       return;
@@ -181,6 +200,31 @@ export default function Home() {
     }, SPIN_DURATION);
   };
 
+  const isResetAvailable = hasResult && !isSpinning;
+  const buttonAction = isResetAvailable ? handleReset : handleStart;
+  const buttonLabel = isSpinning
+    ? "Sorteio em andamento..."
+    : isResetAvailable
+    ? "Realizar Novo Sorteio"
+    : "Iniciar Sorteio";
+  const buttonIcon = isSpinning ? "⏳" : isResetAvailable ? "↺" : "▶";
+  const baseButtonClasses =
+    "group relative flex items-center gap-3 rounded-full px-8 py-3 text-base font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed";
+  const buttonClassName = [
+    baseButtonClasses,
+    isResetAvailable
+      ? "bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-500 text-slate-900 shadow-[0_22px_60px_rgba(16,185,129,0.35)] hover:shadow-[0_28px_80px_rgba(6,182,212,0.45)] disabled:opacity-60 disabled:shadow-none"
+      : "bg-white/95 text-slate-900 hover:shadow-[0_20px_60px_rgba(148,163,184,0.35)] disabled:bg-white/20 disabled:text-white/50 disabled:shadow-none",
+  ].join(" ");
+  const buttonIconClassName = [
+    "flex h-9 w-9 items-center justify-center rounded-full text-lg transition duration-300 group-hover:scale-110",
+    isSpinning
+      ? "bg-slate-900 text-white shadow-[0_8px_20px_rgba(15,23,42,0.45)]"
+      : isResetAvailable
+      ? "bg-white/90 text-slate-900 shadow-[0_14px_30px_rgba(16,185,129,0.35)] group-hover:bg-white"
+      : "bg-slate-900 text-white shadow-[0_12px_30px_rgba(15,23,42,0.4)] group-hover:bg-slate-800"
+  ].join(" ");
+
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-hidden">
       <div className="pointer-events-none absolute -top-40 left-1/2 h-[640px] w-[640px] -translate-x-1/2 rounded-full bg-indigo-500/20 blur-3xl" />
@@ -200,18 +244,19 @@ export default function Home() {
           </p>
           <div className="mt-4 flex flex-col items-center gap-4 lg:flex-row lg:items-center">
             <button
-              onClick={handleStart}
+              type="button"
+              onClick={buttonAction}
               disabled={isButtonDisabled}
-              className="group relative flex items-center gap-3 rounded-full bg-white px-8 py-3 text-base font-medium text-slate-900 transition hover:shadow-[0_20px_60px_rgba(148,163,184,0.35)] disabled:cursor-not-allowed disabled:bg-white/20 disabled:text-white/50"
+              className={buttonClassName}
             >
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-white transition group-hover:scale-105 group-hover:bg-slate-800">
-                {isSpinning ? "⏳" : "▶"}
-              </span>
-              {isSpinning ? "Sorteio em andamento..." : "Iniciar Sorteio"}
+              <span className={buttonIconClassName}>{buttonIcon}</span>
+              {buttonLabel}
             </button>
             <span className="text-sm text-white/60">
               {isSpinning
                 ? "A roleta vai revelar o vencedor em instantes."
+                : isResetAvailable
+                ? "Sorteio concluído! Clique para reiniciar a magia e girar novamente."
                 : winner
                 ? "Pronto para girar! O vencedor já foi escolhido pelo backend."
                 : "Carregando participantes e resultado..."}

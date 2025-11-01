@@ -296,17 +296,25 @@ export default function Home() {
           {winner && (
             <div className="flex w-full max-w-3xl flex-col items-center gap-4 rounded-3xl border border-white/10 bg-white/5 p-8 text-center backdrop-blur">
               <p className="text-sm font-semibold uppercase tracking-[0.4em] text-emerald-300/80">
-                Vencedor Confirmado
+                {hasResult
+                  ? "Vencedor Confirmado"
+                  : isCarouselVisible
+                  ? "Processando"
+                  : "Tudo pronto para o sorteio"}
               </p>
               <h2 className="text-3xl font-semibold text-white sm:text-4xl">
                 {hasResult
                   ? `${winner.name} levou o prêmio!`
-                  : "Aguardando o resultado..."}
+                  : isCarouselVisible
+                  ? "Aguardando o resultado..."
+                  : "Todos os participantes carregados"}
               </h2>
               <p className="max-w-2xl text-base text-zinc-300">
                 {hasResult
                   ? `"${winner.comment}" — uma história que vale um brinde com o melhor café.`
-                  : "Assim que a roleta parar, anunciaremos o vencedor escolhido pelo backend."}
+                  : isCarouselVisible
+                  ? "Assim que a roleta parar, anunciaremos o vencedor escolhido."
+                  : "Muito obrigado pela participação em nossa pesquisa e desejamos boa sorte a todos os participantes"}
               </p>
             </div>
           )}

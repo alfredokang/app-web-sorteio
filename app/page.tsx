@@ -106,6 +106,7 @@ export default function Home() {
   const [hasIntroPlayed, setHasIntroPlayed] = useState(false);
   const [isCarouselVisible, setIsCarouselVisible] = useState(false);
   const [isCloudConverging, setIsCloudConverging] = useState(false);
+  const [carouselKey, setCarouselKey] = useState(0);
   const spinTimeout = useRef<NodeJS.Timeout | null>(null);
   const revealTimeout = useRef<NodeJS.Timeout | null>(null);
 
@@ -162,6 +163,7 @@ export default function Home() {
     setHasIntroPlayed(false);
     setIsCloudConverging(false);
     setSeed(Math.floor(Math.random() * 100000));
+    setCarouselKey((previous) => previous + 1);
   };
 
   const handleStart = () => {
@@ -275,6 +277,7 @@ export default function Home() {
                 }`}
               >
                 <Carousel3D
+                  key={carouselKey}
                   participants={participants}
                   isSpinning={isSpinning}
                   winnerId={winnerId}

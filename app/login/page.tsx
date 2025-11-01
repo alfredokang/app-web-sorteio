@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
 import { AuthTemplate } from "../components/AuthTemplate";
 import { useForm } from "react-hook-form";
@@ -19,10 +19,22 @@ export default function LoginPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const { status } = useSession();
+  const authError = searchParams.get("error");
   const callbackUrl = searchParams.get("callbackUrl") ?? "/";
   const callbackSearch = searchParams.get("callbackSearch") ?? "";
+  const derivedAuthErrorMessage = useMemo(() => {
+    if (!authError) {
+      return null;
+    }
+
+    return authError === "CredentialsSignin"
+      ? "E-mail ou senha inválidos."
+      : "Não foi possível fazer login. Tente novamente.";
+  }, [authError]);
+  const activeError = error ?? derivedAuthErrorMessage;
   const {
     register,
     handleSubmit,
@@ -41,6 +53,19 @@ export default function LoginPage() {
     }
   }, [status, callbackUrl, callbackSearch, router]);
 
+  useEffect(() => {
+    if (!authError) {
+      return;
+    }
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("error");
+
+    const nextQuery = params.toString();
+    const nextUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname;
+    router.replace(nextUrl);
+  }, [authError, pathname, router, searchParams]);
+
   const onSubmit = async (values: LoginFormValues) => {
     setError(null);
     setMessage(null);
@@ -56,7 +81,12 @@ export default function LoginPage() {
     });
 
     if (!result || result.error) {
-      setError("E-mail ou senha inválidos.");
+      const friendlyError =
+        result?.error === "CredentialsSignin"
+          ? "E-mail ou senha inválidos."
+          : "Não foi possível fazer login. Verifique seus dados e tente novamente.";
+      setError(friendlyError);
+      setMessage(null);
       return;
     }
 
@@ -140,9 +170,9 @@ export default function LoginPage() {
           {isSubmitting ? "Entrando..." : "Entrar"}
         </button>
 
-        {error && (
+        {activeError && (
           <div className="rounded-2xl border border-rose-400/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
-            {error}
+            {activeError}
           </div>
         )}
 

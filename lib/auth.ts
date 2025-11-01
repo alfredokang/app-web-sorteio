@@ -1,5 +1,5 @@
 import type { NextAuthOptions, Session } from "next-auth";
-import { getServerSession as nextGetServerSession } from "next-auth/next";
+import { getServerSession as nextGetServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 

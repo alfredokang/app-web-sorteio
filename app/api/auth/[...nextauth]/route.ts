@@ -1,4 +1,4 @@
-import NextAuth, { type AuthOptions, type Session } from "next-auth";
+import NextAuth, { type NextAuthOptions, type Session } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { verifyUserCredentials } from "@/lib/mock-users";
@@ -25,7 +25,7 @@ function isAuthorizedUser(value: unknown): value is AuthorizedUser {
 
 const authSecret = process.env.NEXTAUTH_SECRET ?? "development-secret";
 
-export const authOptions: AuthOptions = {
+export const authOptions: NextAuthOptions = {
   secret: authSecret,
   session: {
     strategy: "jwt",
@@ -102,11 +102,6 @@ export const authOptions: AuthOptions = {
   },
 };
 
-const authConfig = NextAuth(authOptions);
+const handler = NextAuth(authOptions);
 
-export const {
-  handlers: { GET, POST },
-  auth,
-  signIn,
-  signOut,
-} = authConfig;
+export { handler as GET, handler as POST };

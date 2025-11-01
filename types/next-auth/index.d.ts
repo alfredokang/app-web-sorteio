@@ -2,21 +2,18 @@ import type { NextRequest } from "next/server";
 
 export type Awaitable<T> = T | Promise<T>;
 
-export interface Session {
-  user: {
-    id: string;
-    email: string;
-    name?: string | null;
-    isAuthorized: boolean;
-  };
-}
-
-export interface User {
+export interface SessionUser {
   id: string;
   email: string;
-  isAuthorized: boolean;
   name?: string | null;
+  isAuthorized: boolean;
 }
+
+export interface Session {
+  user?: SessionUser;
+}
+
+export interface User extends SessionUser {}
 
 export interface Logger {
   error(code: string, metadata: unknown): void;
@@ -30,7 +27,7 @@ export interface CredentialsConfig {
 
 export interface Callbacks {
   jwt?(params: { token: import("next-auth/jwt").JWT; user?: unknown; trigger?: string; session?: Session }): Awaitable<import("next-auth/jwt").JWT>;
-  session?(params: { session: Session; token: import("next-auth/jwt").JWT; user?: User }): Awaitable<Session>;
+  session?(params: { session: Session; token: import("next-auth/jwt").JWT; user?: User | null }): Awaitable<Session>;
 }
 
 export interface AuthOptions {
@@ -52,14 +49,10 @@ export interface AuthOptions {
 
 export type NextAuthOptions = AuthOptions;
 
-export interface NextAuthResult {
-  handlers: {
-    GET: (request: Request) => Promise<Response>;
-    POST: (request: Request) => Promise<Response>;
-  };
-  auth: (request: NextRequest) => Promise<Session | null>;
-  signIn: (...args: unknown[]) => Promise<unknown>;
-  signOut: (...args: unknown[]) => Promise<unknown>;
-}
+export type NextAuthHandler = (request: Request) => Promise<Response>;
 
-export default function NextAuth(options: NextAuthOptions): NextAuthResult;
+export default function NextAuth(options: NextAuthOptions): NextAuthHandler;
+
+export declare function auth(request: NextRequest): Promise<Session | null>;
+export declare function signIn(...args: unknown[]): Promise<unknown>;
+export declare function signOut(...args: unknown[]): Promise<unknown>;

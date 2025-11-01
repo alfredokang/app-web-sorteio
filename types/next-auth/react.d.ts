@@ -1,23 +1,23 @@
-import type { ReactNode } from "react";
 import type { Session } from "next-auth";
+import type { ReactNode } from "react";
 
-export interface UseSessionResult {
+export type SessionStatus = "authenticated" | "unauthenticated" | "loading";
+
+export interface SessionContextValue {
   data: Session | null;
-  status: "authenticated" | "unauthenticated" | "loading";
+  status: SessionStatus;
 }
 
-export function SessionProvider({ children, session }: { children?: ReactNode; session?: Session | null }): ReactNode;
-export function useSession(): UseSessionResult;
-export interface SignInResponse {
-  error?: string | null;
-  status?: number;
-  ok?: boolean;
-  url?: string | null;
+export interface SessionProviderProps {
+  children: ReactNode;
+  session?: Session | null;
 }
 
-export function signIn(
+export declare function useSession(): SessionContextValue;
+export declare function signIn(
   provider?: string,
   options?: Record<string, unknown>,
-  authorizationParams?: Record<string, string>
-): Promise<SignInResponse>;
-export function signOut(options?: Record<string, unknown>): Promise<void>;
+  authorizationParams?: Record<string, unknown>
+): Promise<{ error?: string; url?: string | null } | undefined>;
+export declare function signOut(...args: unknown[]): Promise<unknown>;
+export declare function SessionProvider(props: SessionProviderProps): JSX.Element;

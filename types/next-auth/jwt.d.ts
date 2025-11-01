@@ -1,15 +1,12 @@
-import type { NextRequest } from "next/server";
-
 export interface JWT {
   sub?: string;
-  email?: string;
+  email?: string | null;
+  name?: string | null;
   isAuthorized?: boolean;
   [key: string]: unknown;
 }
 
-export interface GetTokenParams {
-  req: NextRequest;
+export declare function getToken(params: {
+  req: unknown;
   secret?: string;
-}
-
-export function getToken(params: GetTokenParams): Promise<JWT | null>;
+}): Promise<JWT | null>;

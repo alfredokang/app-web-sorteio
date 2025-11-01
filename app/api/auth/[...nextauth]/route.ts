@@ -24,7 +24,7 @@ function isAuthorizedUser(value: unknown): value is AuthorizedUser {
 
 const authSecret = process.env.NEXTAUTH_SECRET ?? "development-secret";
 
-const handler = NextAuth({
+const authConfig = NextAuth({
   secret: authSecret,
   session: {
     strategy: "jwt",
@@ -88,4 +88,9 @@ const handler = NextAuth({
   },
 });
 
-export { handler as GET, handler as POST };
+export const {
+  handlers: { GET, POST },
+  auth,
+  signIn,
+  signOut,
+} = authConfig;

@@ -20,7 +20,10 @@
     ],
     "paths": {
       "@/*": ["./*"],
-      "react-hook-form": ["./lib/react-hook-form"]
+      "react-hook-form": ["./lib/react-hook-form"],
+      "next-auth": ["./types/next-auth/index"],
+      "next-auth/*": ["./types/next-auth/*"],
+      "bcrypt-ts": ["./types/bcrypt-ts"]
     }
   },
   "include": [

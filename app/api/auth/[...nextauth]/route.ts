@@ -1,4 +1,5 @@
-import NextAuth, { type NextAuthOptions } from "next-auth";
+import NextAuth, { type AuthOptions, type Session } from "next-auth";
+import type { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { verifyUserCredentials } from "@/lib/mock-users";
 
@@ -24,7 +25,7 @@ function isAuthorizedUser(value: unknown): value is AuthorizedUser {
 
 const authSecret = process.env.NEXTAUTH_SECRET ?? "development-secret";
 
-export const authOptions = {
+export const authOptions: AuthOptions = {
   secret: authSecret,
   session: {
     strategy: "jwt",
@@ -40,7 +41,7 @@ export const authOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials?: Record<string, unknown>) {
         const email =
           typeof credentials?.email === "string"
             ? credentials.email.trim().toLowerCase()
@@ -70,7 +71,7 @@ export const authOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: JWT; user?: unknown }) {
       if (isAuthorizedUser(user)) {
         token.sub = user.id;
         token.email = user.email;
@@ -78,7 +79,7 @@ export const authOptions = {
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token }: { session: Session; token: JWT }) {
       if (session.user) {
         if (typeof token.email === "string") {
           session.user.email = token.email;
@@ -92,14 +93,14 @@ export const authOptions = {
     },
   },
   logger: {
-    error(code, metadata) {
+    error(code: string, metadata: unknown) {
       if (code === "CredentialsSignin") {
         return;
       }
       console.error(code, metadata);
     },
   },
-} satisfies NextAuthOptions;
+};
 
 const authConfig = NextAuth(authOptions);
 

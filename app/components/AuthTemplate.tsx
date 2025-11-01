@@ -4,7 +4,7 @@ interface AuthTemplateProps {
   title: string;
   subtitle: string;
   children: ReactNode;
-  footer: ReactNode;
+  footer?: ReactNode;
 }
 
 export function AuthTemplate({
@@ -37,7 +37,7 @@ export function AuthTemplate({
           <div className="relative space-y-8">{children}</div>
         </div>
 
-        <div className="mt-8 text-center text-sm text-white/60">{footer}</div>
+        {footer && <div className="mt-8 text-center text-sm text-white/60">{footer}</div>}
       </div>
     </div>
   );

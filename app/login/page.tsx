@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
-import { AuthTemplate } from "../components/AuthTemplate";
 import { useForm } from "react-hook-form";
+
+import { AuthTemplate } from "../components/AuthTemplate";
 
 type LoginFormValues = {
   email: string;
@@ -16,6 +18,7 @@ const emailPattern =
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: session, status } = useSession();
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -54,21 +57,44 @@ export default function LoginPage() {
       return;
     }
 
-    setMessage("Login realizado com sucesso! Redirecionando...");
-    router.replace("/");
+    setMessage("Login realizado! Verificando permissões de acesso...");
     router.refresh();
   };
 
   useEffect(() => {
-    if (status === "authenticated" && session?.user.isAuthorized) {
-      router.replace("/");
+    if (status === "authenticated" && session?.user?.isAuthorized) {
+      const callbackUrl = searchParams.get("callbackUrl");
+      router.replace(callbackUrl ?? "/");
     }
-  }, [status, session?.user.isAuthorized, router]);
+  }, [status, session?.user?.isAuthorized, router, searchParams]);
+
+  const sessionError = useMemo(() => {
+    if (status === "authenticated" && session?.user && !session.user.isAuthorized) {
+      return "Seu cadastro foi recebido, mas ainda aguarda liberação da equipe. Assim que for autorizado você poderá acessar a área restrita.";
+    }
+
+    return null;
+  }, [status, session?.user]);
+
+  const finalMessage = useMemo(() => {
+    if (status === "authenticated" && session?.user?.isAuthorized) {
+      return "Acesso liberado! Redirecionando...";
+    }
+
+    return message;
+  }, [status, session?.user?.isAuthorized, message]);
+
+  const finalError = sessionError ?? error;
 
   return (
     <AuthTemplate
       title="Faça login para continuar"
       subtitle="Use as credenciais fornecidas pela equipe para acessar a área interna."
+      footer={
+        <p>
+          Ainda não tem acesso? <Link href="/signup" className="font-semibold text-white">Cadastre-se aqui</Link>.
+        </p>
+      }
     >
       <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-2">
@@ -96,10 +122,7 @@ export default function LoginPage() {
         </div>
 
         <div className="space-y-2">
-          <label
-            className="text-sm font-medium text-white/80"
-            htmlFor="password"
-          >
+          <label className="text-sm font-medium text-white/80" htmlFor="password">
             Senha
           </label>
           <input
@@ -136,14 +159,14 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {message && (
+        {finalMessage && (
           <div className="rounded-2xl border border-emerald-400/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
-            {message}
+            {finalMessage}
           </div>
         )}
-        {error && (
+        {finalError && (
           <div className="rounded-2xl border border-rose-400/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
-            {error}
+            {finalError}
           </div>
         )}
         {session && (

@@ -1,6 +1,9 @@
 import type { NextAuthOptions, Session } from "next-auth";
 import { getServerSession as nextGetServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { compare } from "bcryptjs";
+
+import { findUserByEmail } from "./mockdb";
 
 export const MOCK_USER = {
   id: "mock-1",
@@ -9,6 +12,8 @@ export const MOCK_USER = {
   password: "Mock@1234",
   isAuthorized: true,
 } as const;
+
+const ENABLE_MOCK = process.env.ENABLE_MOCK !== "false";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -33,6 +38,7 @@ export const authOptions: NextAuthOptions = {
         const password = credentials.password;
 
         if (
+          ENABLE_MOCK &&
           email === MOCK_USER.email.toLowerCase() &&
           password === MOCK_USER.password
         ) {
@@ -44,7 +50,24 @@ export const authOptions: NextAuthOptions = {
           };
         }
 
-        throw new Error("Credenciais inválidas para este ambiente.");
+        const storedUser = await findUserByEmail(email);
+
+        if (!storedUser) {
+          throw new Error("Não encontramos um cadastro com estas credenciais.");
+        }
+
+        const isPasswordValid = await compare(password, storedUser.passwordHash);
+
+        if (!isPasswordValid) {
+          throw new Error("Não encontramos um cadastro com estas credenciais.");
+        }
+
+        return {
+          id: storedUser.id,
+          name: storedUser.name,
+          email: storedUser.email,
+          isAuthorized: storedUser.isAuthorized,
+        };
       },
     }),
   ],

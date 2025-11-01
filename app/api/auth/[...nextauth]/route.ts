@@ -1,4 +1,4 @@
-import NextAuth, { type NextAuthConfig } from "next-auth";
+import NextAuth, { type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { verifyUserCredentials } from "@/lib/mock-users";
 
@@ -99,7 +99,7 @@ export const authOptions = {
       console.error(code, metadata);
     },
   },
-} satisfies NextAuthConfig;
+} satisfies NextAuthOptions;
 
 const authConfig = NextAuth(authOptions);
 

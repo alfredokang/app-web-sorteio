@@ -1,7 +1,7 @@
 import NextAuth, { type NextAuthOptions, type Session } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { verifyUserCredentials } from "@/lib/mock-users";
+import { verifyUserCredentials } from "../../../../lib/users-service";
 
 type AuthorizedUser = {
   id: string;

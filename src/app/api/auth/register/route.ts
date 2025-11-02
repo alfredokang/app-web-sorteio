@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createMockUser, getUserByEmail } from "@/lib/mock-users";
+import { createUser, getUserByEmail } from "../../../../lib/users-service";
 
 export async function POST(request: Request) {
   try {
@@ -7,9 +7,9 @@ export async function POST(request: Request) {
     const rawFullName =
       typeof body?.fullName === "string" ? body.fullName.trim() : undefined;
     const rawEmail = typeof body?.email === "string" ? body.email.trim() : "";
-    const rawPassword =
-      typeof body?.password === "string" ? body.password : "";
-    const rawPhone = typeof body?.phone === "string" ? body.phone.trim() : undefined;
+    const rawPassword = typeof body?.password === "string" ? body.password : "";
+    const rawPhone =
+      typeof body?.phone === "string" ? body.phone.trim() : undefined;
 
     if (!rawEmail || !rawPassword) {
       return NextResponse.json(
@@ -20,20 +20,20 @@ export async function POST(request: Request) {
 
     const normalizedEmail = rawEmail.toLowerCase();
 
-    const existingUser = getUserByEmail(normalizedEmail);
-    if (existingUser) {
+    const existingUser = await getUserByEmail(normalizedEmail);
+    if (existingUser != null) {
       return NextResponse.json(
         { error: "Este e-mail já está cadastrado." },
         { status: 409 }
       );
     }
 
-    const user = await createMockUser({
+    const user = await createUser({
       email: normalizedEmail,
       password: rawPassword,
       fullName: rawFullName,
       phone: rawPhone,
-      isAuthorized: true,
+      isAuthorized: false,
     });
 
     return NextResponse.json(

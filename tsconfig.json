@@ -13,17 +13,18 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
+    "baseUrl": "src",
     "plugins": [
       {
         "name": "next"
       }
     ],
     "paths": {
-      "@/*": ["./*"],
-      "react-hook-form": ["./lib/react-hook-form"],
-      "next-auth": ["./types/next-auth/index"],
-      "next-auth/*": ["./types/next-auth/*"],
-      "bcrypt-ts": ["./types/bcrypt-ts"]
+      "@/*": ["*"],
+      "react-hook-form": ["src/lib/react-hook-form"],
+      "bcrypt-ts": ["src/types/bcrypt-ts"]
+      // "next-auth": ["./types/next-auth/index"],
+      // "next-auth/*": ["./types/next-auth/*"],
     }
   },
   "include": [
@@ -32,7 +33,9 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    "**/*.mts",
+    // 👇 garante que augmentations de tipagem personalizadas também sejam incluídas
+    "src/types/**/*.d.ts"
   ],
   "exclude": ["node_modules"]
 }

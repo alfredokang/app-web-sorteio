@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { AuthTemplate } from "../components/AuthTemplate";
-import { useForm } from "react-hook-form";
+import { useForm } from "../../lib/react-hook-form";
 
 type SignUpFormValues = {
   fullName: string;
@@ -80,7 +80,9 @@ export default function SignUpPage() {
       }
 
       setMessage(
-        `Cadastro criado para ${trimmedFullName.split(" ")[0]}! Você já pode fazer login.`
+        `Cadastro criado para ${
+          trimmedFullName.split(" ")[0]
+        }! Você já pode fazer login.`
       );
       reset({
         fullName: "",
@@ -91,7 +93,9 @@ export default function SignUpPage() {
       });
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : "Não foi possível concluir o cadastro.";
+        err instanceof Error
+          ? err.message
+          : "Não foi possível concluir o cadastro.";
       setError(errorMessage);
     }
   };

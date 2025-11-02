@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
 import { AuthTemplate } from "../components/AuthTemplate";
-import { useForm } from "react-hook-form";
+import { useForm } from "../../lib/react-hook-form";
 
 type LoginFormValues = {
   email: string;

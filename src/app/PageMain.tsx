@@ -97,7 +97,7 @@ const MOCK_PARTICIPANTS: Participant[] = [
 const PRESELECTED_WINNER_ID = "4";
 const SPIN_DURATION = 10000;
 
-export default function Home() {
+export default function PageMain() {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [winnerId, setWinnerId] = useState<string | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);

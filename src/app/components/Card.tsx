@@ -8,15 +8,15 @@ interface CardProps {
   isActive?: boolean;
 }
 
-const avatarByGender: Record<Participant["gender"], string> = {
-  male: "/avatars/male.svg",
-  female: "/avatars/female.svg",
+const avatarByGender: Record<Participant["avatar"], string> = {
+  Masculino: "/avatars/male.svg",
+  Feminino: "/avatars/female.svg",
 };
 
 export function Card({ participant, isActive = false }: CardProps) {
   const stars = Array.from(
     { length: 5 },
-    (_, index) => index < participant.rating
+    (_, index) => index < participant?.questionThree?.minasCafeRate
   );
 
   return (
@@ -38,7 +38,10 @@ export function Card({ participant, isActive = false }: CardProps) {
         <div className="flex items-center gap-4">
           <div className="relative h-16 w-16 overflow-hidden rounded-2xl border border-white/20 bg-white/5">
             <Image
-              src={avatarByGender[participant.gender]}
+              src={
+                avatarByGender[participant.avatar || "Masculino"] ||
+                "/avatars/male.svg"
+              }
               alt={`Avatar de ${participant.name}`}
               fill
               className="object-cover"
@@ -47,7 +50,7 @@ export function Card({ participant, isActive = false }: CardProps) {
           </div>
           <div className="flex flex-col">
             <span className="text-lg font-semibold text-white">
-              {participant.name}
+              {participant.name.formatFullName}
             </span>
             <div className="flex items-center gap-1 text-sm text-amber-400">
               {stars.map((filled, index) => (
@@ -56,7 +59,9 @@ export function Card({ participant, isActive = false }: CardProps) {
             </div>
           </div>
         </div>
-        <p className="text-sm text-zinc-200">“{participant.comment}”</p>
+        <p className="text-sm text-zinc-200">
+          “{participant.questionThree.followUp}”
+        </p>
       </div>
     </div>
   );

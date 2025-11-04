@@ -50,7 +50,8 @@ export function FloatingParticipants({
 }: FloatingParticipantsProps) {
   const layouts = useMemo(() => {
     return participants.map<ParticipantLayout>((participant, index) => {
-      const baseSeed = stringToSeed(`${participant.id}-${participant.name}`) + index;
+      const baseSeed =
+        stringToSeed(`${participant.id}-${participant.name}`) + index;
       const translateX = randomInRange(baseSeed + 1, -240, 240);
       const translateY = randomInRange(baseSeed + 2, -180, 200);
       const floatX = randomInRange(baseSeed + 3, 16, 60);
@@ -120,14 +121,14 @@ export function FloatingParticipants({
               <div className="floating-card-inner">
                 <div className="flex items-center gap-2">
                   <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900/70 text-[11px] font-semibold text-white/80">
-                    {participant.name.slice(0, 1).toUpperCase()}
+                    {participant.name.formatFullName.slice(0, 1).toUpperCase()}
                   </span>
                   <div className="flex min-w-0 flex-col">
-                    <span className="truncate text-xs font-medium text-white/90">
-                      {participant.name}
+                    <span className="truncate text-xs font-medium text-white/90 max-w-[150px]">
+                      {participant.name.formatFullName}
                     </span>
                     <span className="floating-card-comment text-[10px] text-white/70">
-                      {participant.comment}
+                      {participant.questionThree.followUp}
                     </span>
                   </div>
                 </div>

@@ -1,7 +1,31 @@
 export type Participant = {
-  id: string;
-  name: string;
-  gender: "male" | "female";
-  comment: string;
-  rating: 1 | 2 | 3 | 4 | 5;
+  id: string; // mesmo que _id ou documentId
+  name: {
+    formatFullName: string;
+    formatSurname: string;
+    formatName: string;
+  };
+  avatar: "Masculino" | "Feminino" | string;
+  cpfCliente: string;
+  phone: {
+    phoneWithoutCode: string;
+    phoneClean: string;
+    formatPhone: string;
+  };
+  questionOne: {
+    whichCoffee: string;
+  };
+  questionTwo: {
+    purchasePurpose: string;
+  };
+  questionThree: {
+    minasCafeRate: number;
+    followUp: string | null;
+  };
+  questionFour: {
+    considerExchange?: string;
+  };
+  chosen: boolean;
+  createdAt: string;
+  updatedAt: string;
 };

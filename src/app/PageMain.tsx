@@ -6,93 +6,8 @@ import { Carousel3D } from "./components/Carousel3D";
 import { ConfettiOverlay } from "./components/ConfettiOverlay";
 import { FloatingParticipants } from "./components/FloatingParticipants";
 import { Participant } from "./components/types";
-
-const MOCK_PARTICIPANTS: Participant[] = [
-  {
-    id: "1",
-    name: "Marina Alves",
-    gender: "female",
-    comment: "Amo começar o dia com um espresso bem encorpado!",
-    rating: 5,
-  },
-  {
-    id: "2",
-    name: "Lucas Ribeiro",
-    gender: "male",
-    comment: "Latte com canela é meu ritual da tarde.",
-    rating: 4,
-  },
-  {
-    id: "3",
-    name: "Sofia Martins",
-    gender: "female",
-    comment: "Cold brew geladinho salva o verão!",
-    rating: 5,
-  },
-  {
-    id: "4",
-    name: "Pedro Carvalho",
-    gender: "male",
-    comment: "Cappuccino com notas de chocolate é imbatível.",
-    rating: 5,
-  },
-  {
-    id: "5",
-    name: "Bianca Lima",
-    gender: "female",
-    comment: "Filtro coado na V60 é meu momento zen.",
-    rating: 4,
-  },
-  {
-    id: "6",
-    name: "Rafael Nunes",
-    gender: "male",
-    comment: "Affogato é a sobremesa perfeita.",
-    rating: 5,
-  },
-  {
-    id: "7",
-    name: "Camila Duarte",
-    gender: "female",
-    comment: "Macchiato com leite vegetal é o meu favorito.",
-    rating: 4,
-  },
-  {
-    id: "8",
-    name: "Henrique Costa",
-    gender: "male",
-    comment: "Café passado na prensa francesa tem outro sabor.",
-    rating: 5,
-  },
-  {
-    id: "9",
-    name: "111111",
-    gender: "male",
-    comment: "Affogato é a sobremesa perfeita.",
-    rating: 5,
-  },
-  {
-    id: "10",
-    name: "2222222",
-    gender: "female",
-    comment: "Macchiato com leite vegetal é o meu favorito.",
-    rating: 4,
-  },
-  {
-    id: "11",
-    name: "33333333",
-    gender: "male",
-    comment: "Café passado na prensa francesa tem outro sabor.",
-    rating: 5,
-  },
-  {
-    id: "12",
-    name: "444444444",
-    gender: "male",
-    comment: "Café passado na prensa francesa tem outro sabor.",
-    rating: 5,
-  },
-];
+import { firestore } from "@/firebase/client";
+import { collection, getDocs } from "firebase/firestore";
 
 const PRESELECTED_WINNER_ID = "4";
 const SPIN_DURATION = 10000;
@@ -111,20 +26,47 @@ export default function PageMain() {
   const spinTimeout = useRef<NodeJS.Timeout | null>(null);
   const revealTimeout = useRef<NodeJS.Timeout | null>(null);
 
+  // Carrega participantes do Firestore
   useEffect(() => {
-    const loadTimeout = setTimeout(() => {
-      setParticipants(MOCK_PARTICIPANTS);
-    }, 800);
+    async function loadParticipants() {
+      try {
+        const colRef = collection(firestore, "participants");
+        const snapshot = await getDocs(colRef);
+        const participantsData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Participant[];
 
-    const winnerTimeout = setTimeout(() => {
-      setWinnerId(PRESELECTED_WINNER_ID);
-    }, 1600);
+        setParticipants(participantsData);
 
-    return () => {
-      clearTimeout(loadTimeout);
-      clearTimeout(winnerTimeout);
-    };
+        // Se quiser pré-definir um vencedor (por id ou random)
+        if (participantsData.length > 0) {
+          setWinnerId(participantsData[0].id); // exemplo: primeiro participante
+        }
+      } catch (error) {
+        console.error("Erro ao carregar participantes:", error);
+      }
+    }
+
+    loadParticipants();
   }, []);
+
+  console.log(participants);
+
+  // useEffect(() => {
+  //   const loadTimeout = setTimeout(() => {
+  //     setParticipants(MOCK_PARTICIPANTS);
+  //   }, 800);
+
+  //   const winnerTimeout = setTimeout(() => {
+  //     setWinnerId(PRESELECTED_WINNER_ID);
+  //   }, 1600);
+
+  //   return () => {
+  //     clearTimeout(loadTimeout);
+  //     clearTimeout(winnerTimeout);
+  //   };
+  // }, []);
 
   useEffect(() => {
     return () => {
@@ -315,14 +257,18 @@ export default function PageMain() {
               </p>
               <h2 className="text-3xl font-semibold text-white sm:text-4xl">
                 {hasResult
-                  ? `${winner.name} levou o prêmio!`
+                  ? `${winner.name.formatFullName} levou o prêmio!`
                   : isCarouselVisible
                   ? "Aguardando o resultado..."
                   : "Todos os participantes carregados"}
               </h2>
               <p className="max-w-2xl text-base text-zinc-300">
                 {hasResult
-                  ? `"${winner.comment}" — uma história que vale um brinde com o melhor café.`
+                  ? `${
+                      winner?.questionThree?.followUp
+                        ? `${winner.questionThree.followUp} — uma história que vale um brinde com o melhor café.`
+                        : "Uma história que vale um brinde com o melhor café."
+                    }`
                   : isCarouselVisible
                   ? "Assim que a roleta parar, anunciaremos o vencedor escolhido."
                   : "Muito obrigado pela participação em nossa pesquisa e desejamos boa sorte a todos os participantes"}

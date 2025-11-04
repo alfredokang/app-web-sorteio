@@ -332,7 +332,7 @@ export default function PageMain() {
         </section>
       </main>
       <footer className="relative z-10 flex w-full justify-center pb-10 text-xs text-white/40">
-        Feito pela MindByte com uma pitada de magia do café.
+        Criado entre sorteios e goles de café — by SorteZapp.
       </footer>
     </div>
   );

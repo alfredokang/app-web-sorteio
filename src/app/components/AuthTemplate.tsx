@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ReactNode } from "react";
 
 interface AuthTemplateProps {
@@ -23,6 +24,12 @@ export function AuthTemplate({
 
       <div className="relative w-full max-w-xl">
         <div className="mb-10 text-center">
+          <h1 className="text-5xl font-semibold font-sans text-blue-300">
+            SorteZapp
+          </h1>
+          <p className="mb-10 text-md text-blue-200">
+            Sorteios Rápidos e Automáticos pelo WhatsApp
+          </p>
           <span className="inline-flex items-center rounded-full border border-white/10 bg-white/10 px-4 py-1 text-xs font-semibold tracking-[0.3em] text-white/70 uppercase">
             Bem-vindo
           </span>
@@ -38,6 +45,14 @@ export function AuthTemplate({
         </div>
 
         <div className="mt-8 text-center text-sm text-white/60">{footer}</div>
+        <div className="mt-15 text-center">
+          <span className="text-white/70 font-semibold">
+            Aumente suas vendas com sorteios automáticos. Chama no Zapp!
+          </span>
+          <span className="block mt-1 text-blue-300 underline font-semibold">
+            <Link href="#">Saiba Mais</Link>
+          </span>
+        </div>
       </div>
     </div>
   );

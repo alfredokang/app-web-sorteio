@@ -9,7 +9,8 @@ import { Participant } from "./components/types";
 import { firestore } from "@/firebase/client";
 import { collection, getDocs, query, where } from "firebase/firestore";
 
-const SPIN_DURATION = 10000;
+const SPIN_DURATION = 10000; // 10 segundos
+const WEBHOOK_DELAY = 10000; // 10 segundos
 
 export default function PageMain() {
   const [participants, setParticipants] = useState<Participant[]>([]);
@@ -17,7 +18,7 @@ export default function PageMain() {
     useState<Participant | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [seed, setSeed] = useState(() => Math.floor(Math.random() * 120000));
+  const [seed, setSeed] = useState(() => Math.floor(Math.random() * 100000));
   const [hasResult, setHasResult] = useState(false);
   const [hasIntroPlayed, setHasIntroPlayed] = useState(false);
   const [isCarouselVisible, setIsCarouselVisible] = useState(false);
@@ -26,6 +27,7 @@ export default function PageMain() {
   const spinTimeout = useRef<NodeJS.Timeout | null>(null);
   const revealTimeout = useRef<NodeJS.Timeout | null>(null);
   const [reload, setReload] = useState(false);
+  const [hasSentWebhook, setHasSentWebhook] = useState(false);
 
   // Carrega participantes do Firestore
   useEffect(() => {
@@ -63,6 +65,34 @@ export default function PageMain() {
     };
   }, []);
 
+  // Envia o webhook automaticamente quando o sorteio finaliza e há um vencedor
+  useEffect(() => {
+    if (!hasResult || !winnerParticipant || hasSentWebhook) return;
+
+    const delay = setTimeout(async () => {
+      try {
+        const response = await fetch(
+          "https://webhook.mindbyte.com.br/webhook/envia-msg-vencedor",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(winnerParticipant),
+          }
+        );
+
+        if (response.ok) {
+          setHasSentWebhook(true);
+        } else {
+          console.error("Erro ao enviar webhook:", await response.text());
+        }
+      } catch (error) {
+        console.error("Erro ao disparar webhook:", error);
+      }
+    }, WEBHOOK_DELAY); // dispara 10s após o confete aparecer
+
+    return () => clearTimeout(delay);
+  }, [hasResult, winnerParticipant, hasSentWebhook]);
+
   const isButtonDisabled = isSpinning || !participants.length;
 
   const shouldShowCloud =
@@ -85,29 +115,30 @@ export default function PageMain() {
     setIsCarouselVisible(false);
     setHasIntroPlayed(false);
     setIsCloudConverging(false);
-    setSeed(Math.floor(Math.random() * 120000));
+    setSeed(Math.floor(Math.random() * 100000));
     setCarouselKey((previous) => previous + 1);
   };
 
   const handleStart = async () => {
     if (isButtonDisabled) return;
 
+    // Reseta timeouts e estados
     if (spinTimeout.current) clearTimeout(spinTimeout.current);
+    if (revealTimeout.current) clearTimeout(revealTimeout.current);
 
-    setIsSpinning(true);
+    setIsSpinning(true); // começa a girar IMEDIATAMENTE
     setShowConfetti(false);
     setHasResult(false);
-    setSeed(Math.floor(Math.random() * 120000));
+    setSeed(Math.floor(Math.random() * 100000));
+    setHasSentWebhook(false);
 
     try {
-      // Chama a API do sorteio (POST vazio)
+      // Chama a API de sorteio enquanto a roleta já está girando
       const response = await fetch(
         "https://webhook.mindbyte.com.br/webhook/sorteia-participante",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
         }
       );
 
@@ -120,43 +151,28 @@ export default function PageMain() {
         return;
       }
 
-      // Define o vencedor retornado pela API
       if (data) {
         const winnerData = data as Participant;
         setWinnerParticipant(winnerData);
 
-        // Atualiza participantes locais (opcional)
+        // Atualiza lista local (opcional)
         setParticipants((prev) => [
           ...prev.filter((p) => p.id !== winnerData.id),
           winnerData,
         ]);
+
+        // Continua girando mais 10s APÓS receber o vencedor
+        if (spinTimeout.current) clearTimeout(spinTimeout.current);
+        spinTimeout.current = setTimeout(() => {
+          setIsSpinning(false);
+          setHasResult(true);
+          setShowConfetti(true);
+        }, 10000); // 10 segundos extras após o vencedor chegar
       }
     } catch (error) {
       console.error("Erro ao chamar webhook de sorteio:", error);
       setIsSpinning(false);
-      return;
     }
-
-    // Continua a animação após receber o vencedor
-    if (!hasIntroPlayed) {
-      setIsCloudConverging(true);
-
-      if (revealTimeout.current) clearTimeout(revealTimeout.current);
-
-      revealTimeout.current = setTimeout(() => {
-        setIsCloudConverging(false);
-        setHasIntroPlayed(true);
-        setIsCarouselVisible(true);
-      }, 1100);
-    } else {
-      setIsCarouselVisible(true);
-    }
-
-    spinTimeout.current = setTimeout(() => {
-      setIsSpinning(false);
-      setHasResult(true);
-      setShowConfetti(true);
-    }, SPIN_DURATION);
   };
 
   const isResetAvailable = hasResult && !isSpinning;

@@ -332,7 +332,7 @@ export default function PageMain() {
         </section>
       </main>
       <footer className="relative z-10 flex w-full justify-center pb-10 text-xs text-white/40">
-        Feito com Next.js, Tailwind CSS e uma pitada de magia do café.
+        Feito pela MindByte com uma pitada de magia do café.
       </footer>
     </div>
   );

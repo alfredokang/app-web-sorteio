@@ -7,7 +7,7 @@ import { ConfettiOverlay } from "./components/ConfettiOverlay";
 import { FloatingParticipants } from "./components/FloatingParticipants";
 import { Participant } from "./components/types";
 import { firestore } from "@/firebase/client";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 
 const PRESELECTED_WINNER_ID = "4";
 const SPIN_DURATION = 10000;
@@ -31,7 +31,10 @@ export default function PageMain() {
     async function loadParticipants() {
       try {
         const colRef = collection(firestore, "participants");
-        const snapshot = await getDocs(colRef);
+        const q = query(colRef, where("chosen", "==", false));
+
+        const snapshot = await getDocs(q);
+
         const participantsData = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
@@ -39,9 +42,8 @@ export default function PageMain() {
 
         setParticipants(participantsData);
 
-        // Se quiser pré-definir um vencedor (por id ou random)
         if (participantsData.length > 0) {
-          setWinnerId(participantsData[0].id); // exemplo: primeiro participante
+          setWinnerId(participantsData[0].id);
         }
       } catch (error) {
         console.error("Erro ao carregar participantes:", error);
@@ -50,23 +52,6 @@ export default function PageMain() {
 
     loadParticipants();
   }, []);
-
-  console.log(participants);
-
-  // useEffect(() => {
-  //   const loadTimeout = setTimeout(() => {
-  //     setParticipants(MOCK_PARTICIPANTS);
-  //   }, 800);
-
-  //   const winnerTimeout = setTimeout(() => {
-  //     setWinnerId(PRESELECTED_WINNER_ID);
-  //   }, 1600);
-
-  //   return () => {
-  //     clearTimeout(loadTimeout);
-  //     clearTimeout(winnerTimeout);
-  //   };
-  // }, []);
 
   useEffect(() => {
     return () => {

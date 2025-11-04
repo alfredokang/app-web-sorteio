@@ -212,7 +212,7 @@ export default function PageMain() {
     : "Iniciar Sorteio";
   const buttonIcon = isSpinning ? "⏳" : isResetAvailable ? "↺" : "▶";
   const baseButtonClasses =
-    "group relative flex items-center gap-3 rounded-full px-8 py-3 text-base font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed";
+    "cursor-pointer group relative flex items-center gap-3 rounded-full px-8 py-3 text-base font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed";
   const buttonClassName = [
     baseButtonClasses,
     isResetAvailable
@@ -237,7 +237,7 @@ export default function PageMain() {
       <button
         type="button"
         onClick={handleLogout}
-        className="absolute right-6 top-6 z-30 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium text-white/70 backdrop-blur transition hover:bg-white/20 hover:text-white"
+        className="absolute right-6 top-6 z-30 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium text-white/70 backdrop-blur transition hover:bg-white/20 hover:text-white cursor-pointer"
       >
         Sair
       </button>

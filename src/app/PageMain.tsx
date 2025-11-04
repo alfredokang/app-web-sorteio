@@ -236,32 +236,33 @@ export default function PageMain() {
         <section className="mt-16 flex flex-col items-center gap-10">
           <div className="w-full max-w-4xl">
             <div className="relative w-full min-h-[420px]">
+              <div
+                className={`h-full w-full transition-all duration-700 ease-out ${
+                  isCarouselVisible
+                    ? "opacity-100 translate-y-0"
+                    : "pointer-events-none opacity-0 translate-y-6"
+                }`}
+              >
+                <Carousel3D
+                  key={carouselKey}
+                  participants={participants}
+                  isSpinning={isSpinning}
+                  winnerParticipant={winnerParticipant}
+                  spinDuration={SPIN_DURATION}
+                />
+              </div>
               {participants.length > 0 ? (
-                <>
-                  <div
-                    className={`h-full w-full transition-all duration-700 ease-out ${
-                      isCarouselVisible
-                        ? "opacity-100 translate-y-0"
-                        : "pointer-events-none opacity-0 translate-y-6"
-                    }`}
-                  >
-                    <Carousel3D
-                      key={carouselKey}
-                      participants={participants}
-                      isSpinning={isSpinning}
-                      winnerParticipant={winnerParticipant}
-                      spinDuration={SPIN_DURATION}
-                    />
-                  </div>
-
-                  <FloatingParticipants
-                    participants={participants}
-                    isVisible={shouldShowCloud}
-                    isConverging={isCloudConverging}
-                  />
-                </>
+                <FloatingParticipants
+                  participants={participants}
+                  isVisible={shouldShowCloud}
+                  isConverging={isCloudConverging}
+                />
               ) : (
-                <>Carregando...</>
+                <div className="flex justify-center">
+                  <span className="text-sm text-white/60">
+                    Carregando participantes, aguarde...
+                  </span>
+                </div>
               )}
             </div>
           </div>

@@ -95,7 +95,7 @@ export function FloatingParticipants({
       aria-hidden
     >
       <div className="relative h-full w-full">
-        {layouts.map(({ participant, ...layout }) => {
+        {layouts.map(({ participant, ...layout }, index) => {
           const style: CSSProperties & Record<string, string | number> = {
             "--translate-x": `${layout.translateX}px`,
             "--translate-y": `${layout.translateY}px`,
@@ -113,7 +113,7 @@ export function FloatingParticipants({
 
           return (
             <div
-              key={participant.id}
+              key={`${participant.id}-${index}`}
               className="floating-card"
               data-converging={isConverging}
               style={style}

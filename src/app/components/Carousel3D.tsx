@@ -7,7 +7,7 @@ import { Participant } from "./types";
 interface Carousel3DProps {
   participants: Participant[];
   isSpinning: boolean;
-  winnerId: string | null;
+  winnerParticipant: Participant | null;
   spinDuration?: number;
 }
 
@@ -35,7 +35,7 @@ const resolveFrontStep = (rotation: number, anglePerCard: number) => {
 export function Carousel3D({
   participants,
   isSpinning,
-  winnerId,
+  winnerParticipant,
   spinDuration = 10000,
 }: Carousel3DProps) {
   const [rotation, setRotation] = useState(0);
@@ -84,17 +84,19 @@ export function Carousel3D({
   }, [isSpinning, spinDuration, totalParticipants]);
 
   useEffect(() => {
-    if (isSpinning || !winnerId || totalParticipants === 0 || anglePerCard === 0) {
+    if (
+      isSpinning ||
+      !winnerParticipant ||
+      totalParticipants === 0 ||
+      anglePerCard === 0
+    ) {
       return;
     }
 
-    const targetParticipantIndex = participants.findIndex(
-      (participant) => participant.id === winnerId
+    const targetIndex = participants.findIndex(
+      (p) => p.id === winnerParticipant.id
     );
-
-    if (targetParticipantIndex === -1) {
-      return;
-    }
+    if (targetIndex === -1) return;
 
     cancelAnimationFrame(alignmentRef.current ?? 0);
     alignmentRef.current = requestAnimationFrame(() => {
@@ -104,14 +106,14 @@ export function Carousel3D({
         }
 
         const currentStepPrecise = -previous / anglePerCard;
-        let desiredStep = targetParticipantIndex;
+        let desiredStep = targetIndex;
 
         if (totalParticipants > 0) {
           const cycleSpan = totalParticipants;
           const nearestCycle = Math.round(
-            (currentStepPrecise - targetParticipantIndex) / cycleSpan
+            (currentStepPrecise - targetIndex) / cycleSpan
           );
-          desiredStep = targetParticipantIndex + nearestCycle * cycleSpan;
+          desiredStep = targetIndex + nearestCycle * cycleSpan;
         }
 
         return -desiredStep * anglePerCard;
@@ -126,7 +128,7 @@ export function Carousel3D({
     isSpinning,
     participants,
     totalParticipants,
-    winnerId,
+    winnerParticipant,
   ]);
 
   const radius = 320;
@@ -165,7 +167,11 @@ export function Carousel3D({
       return null;
     }
 
-    const isActive = winnerId === participant.id && !isSpinning;
+    const isActive =
+      winnerParticipant &&
+      !isSpinning &&
+      participant.id === winnerParticipant.id;
+
     const depth = radius + (isActive ? 30 : 0);
     let opacityValue = isActive ? 1 : 0.6;
 
@@ -179,10 +185,7 @@ export function Carousel3D({
 
       const stepsFromFront = Math.abs(normalizedAngle) / anglePerCard;
 
-      if (
-        hideUnderside &&
-        stepsFromFront > maxVisibleStep + fadeWidthInSteps
-      ) {
+      if (hideUnderside && stepsFromFront > maxVisibleStep + fadeWidthInSteps) {
         opacityValue = 0;
       } else if (
         hideUnderside &&
@@ -205,13 +208,15 @@ export function Carousel3D({
         key={`slot-${slotIndex}-${participant.id}`}
         className="absolute left-1/2 top-1/2 w-64 -translate-x-1/2 -translate-y-1/2"
         style={{
-          transform: `rotateY(${slotIndex * anglePerCard}deg) translateZ(${depth}px)`,
+          transform: `rotateY(${
+            slotIndex * anglePerCard
+          }deg) translateZ(${depth}px)`,
           opacity: finalOpacity,
           visibility: isEffectivelyHidden ? "hidden" : "visible",
           transition: "opacity 300ms ease",
         }}
       >
-        <Card participant={participant} isActive={isActive} />
+        <Card participant={participant} isActive={!!isActive} />
       </div>
     );
   });

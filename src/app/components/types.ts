@@ -1,5 +1,5 @@
 export type Participant = {
-  id: string; // mesmo que _id ou documentId
+  id: string;
   name: {
     formatFullName: string;
     formatSurname: string;

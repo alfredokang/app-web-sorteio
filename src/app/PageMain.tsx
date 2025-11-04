@@ -9,12 +9,12 @@ import { Participant } from "./components/types";
 import { firestore } from "@/firebase/client";
 import { collection, getDocs, query, where } from "firebase/firestore";
 
-const PRESELECTED_WINNER_ID = "4";
 const SPIN_DURATION = 10000;
 
 export default function PageMain() {
   const [participants, setParticipants] = useState<Participant[]>([]);
-  const [winnerId, setWinnerId] = useState<string | null>(null);
+  const [winnerParticipant, setWinnerParticipant] =
+    useState<Participant | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [seed, setSeed] = useState(() => Math.floor(Math.random() * 100000));
@@ -25,6 +25,7 @@ export default function PageMain() {
   const [carouselKey, setCarouselKey] = useState(0);
   const spinTimeout = useRef<NodeJS.Timeout | null>(null);
   const revealTimeout = useRef<NodeJS.Timeout | null>(null);
+  const [reload, setReload] = useState(false);
 
   // Carrega participantes do Firestore
   useEffect(() => {
@@ -41,17 +42,15 @@ export default function PageMain() {
         })) as Participant[];
 
         setParticipants(participantsData);
-
-        if (participantsData.length > 0) {
-          setWinnerId(participantsData[0].id);
-        }
       } catch (error) {
         console.error("Erro ao carregar participantes:", error);
       }
     }
 
+    setReload(false);
+
     loadParticipants();
-  }, []);
+  }, [reload]);
 
   useEffect(() => {
     return () => {
@@ -64,17 +63,13 @@ export default function PageMain() {
     };
   }, []);
 
-  const winner = useMemo(
-    () => participants.find((person) => person.id === winnerId) ?? null,
-    [participants, winnerId]
-  );
-
-  const isButtonDisabled = isSpinning || !participants.length || !winnerId;
+  const isButtonDisabled = isSpinning || !participants.length;
 
   const shouldShowCloud =
     (!hasIntroPlayed && participants.length > 0) || isCloudConverging;
 
   const handleReset = () => {
+    setReload(true);
     if (spinTimeout.current) {
       clearTimeout(spinTimeout.current);
       spinTimeout.current = null;
@@ -94,25 +89,59 @@ export default function PageMain() {
     setCarouselKey((previous) => previous + 1);
   };
 
-  const handleStart = () => {
-    if (isButtonDisabled) {
-      return;
-    }
-    if (spinTimeout.current) {
-      clearTimeout(spinTimeout.current);
-    }
+  const handleStart = async () => {
+    if (isButtonDisabled) return;
 
+    if (spinTimeout.current) clearTimeout(spinTimeout.current);
+
+    setIsSpinning(true);
     setShowConfetti(false);
     setHasResult(false);
     setSeed(Math.floor(Math.random() * 100000));
-    setIsSpinning(true);
 
+    try {
+      // Chama a API do sorteio (POST vazio)
+      const response = await fetch(
+        "https://webhook.mindbyte.com.br/webhook/sorteia-participante",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("Erro na API:", data);
+        alert(data.message || "Erro ao sortear participante.");
+        setIsSpinning(false);
+        return;
+      }
+
+      // Define o vencedor retornado pela API
+      if (data) {
+        const winnerData = data as Participant;
+        setWinnerParticipant(winnerData);
+
+        // Atualiza participantes locais (opcional)
+        setParticipants((prev) => [
+          ...prev.filter((p) => p.id !== winnerData.id),
+          winnerData,
+        ]);
+      }
+    } catch (error) {
+      console.error("Erro ao chamar webhook de sorteio:", error);
+      setIsSpinning(false);
+      return;
+    }
+
+    // Continua a animação após receber o vencedor
     if (!hasIntroPlayed) {
       setIsCloudConverging(true);
 
-      if (revealTimeout.current) {
-        clearTimeout(revealTimeout.current);
-      }
+      if (revealTimeout.current) clearTimeout(revealTimeout.current);
 
       revealTimeout.current = setTimeout(() => {
         setIsCloudConverging(false);
@@ -197,7 +226,7 @@ export default function PageMain() {
                 ? "A roleta vai revelar o vencedor em instantes."
                 : isResetAvailable
                 ? "Sorteio concluído! Clique para reiniciar a magia e girar novamente."
-                : winner
+                : winnerParticipant
                 ? "Pronto para girar! O vencedor já foi escolhido pelo backend."
                 : "Carregando participantes e resultado..."}
             </span>
@@ -218,7 +247,7 @@ export default function PageMain() {
                   key={carouselKey}
                   participants={participants}
                   isSpinning={isSpinning}
-                  winnerId={winnerId}
+                  winnerParticipant={winnerParticipant}
                   spinDuration={SPIN_DURATION}
                 />
               </div>
@@ -231,35 +260,33 @@ export default function PageMain() {
             </div>
           </div>
 
-          {winner && (
-            <div className="flex w-full max-w-3xl flex-col items-center gap-4 rounded-3xl border border-white/10 bg-white/5 p-8 text-center backdrop-blur">
-              <p className="text-sm font-semibold uppercase tracking-[0.4em] text-emerald-300/80">
-                {hasResult
-                  ? "Vencedor Confirmado"
-                  : isCarouselVisible
-                  ? "Processando"
-                  : "Tudo pronto para o sorteio"}
-              </p>
-              <h2 className="text-3xl font-semibold text-white sm:text-4xl">
-                {hasResult
-                  ? `${winner.name.formatFullName} levou o prêmio!`
-                  : isCarouselVisible
-                  ? "Aguardando o resultado..."
-                  : "Todos os participantes carregados"}
-              </h2>
-              <p className="max-w-2xl text-base text-zinc-300">
-                {hasResult
-                  ? `${
-                      winner?.questionThree?.followUp
-                        ? `${winner.questionThree.followUp} — uma história que vale um brinde com o melhor café.`
-                        : "Uma história que vale um brinde com o melhor café."
-                    }`
-                  : isCarouselVisible
-                  ? "Assim que a roleta parar, anunciaremos o vencedor escolhido."
-                  : "Muito obrigado pela participação em nossa pesquisa e desejamos boa sorte a todos os participantes"}
-              </p>
-            </div>
-          )}
+          <div className="flex w-full max-w-3xl flex-col items-center gap-4 rounded-3xl border border-white/10 bg-white/5 p-8 text-center backdrop-blur">
+            <p className="text-sm font-semibold uppercase tracking-[0.4em] text-emerald-300/80">
+              {hasResult
+                ? "Vencedor Confirmado"
+                : isCarouselVisible
+                ? "Processando"
+                : "Tudo pronto para o sorteio"}
+            </p>
+            <h2 className="text-3xl font-semibold text-white sm:text-4xl">
+              {hasResult
+                ? `${winnerParticipant?.name?.formatFullName} levou o prêmio!`
+                : isCarouselVisible
+                ? "Aguardando o resultado..."
+                : "Todos os participantes carregados"}
+            </h2>
+            <p className="max-w-2xl text-base text-zinc-300">
+              {hasResult
+                ? `${
+                    winnerParticipant?.questionThree?.followUp
+                      ? `${winnerParticipant.questionThree.followUp} — uma história que vale um brinde com o melhor café.`
+                      : "Uma história que vale um brinde com o melhor café."
+                  }`
+                : isCarouselVisible
+                ? "Assim que a roleta parar, anunciaremos o vencedor escolhido."
+                : "Muito obrigado pela participação em nossa pesquisa e desejamos boa sorte a todos os participantes"}
+            </p>
+          </div>
         </section>
       </main>
       <footer className="relative z-10 flex w-full justify-center pb-10 text-xs text-white/40">

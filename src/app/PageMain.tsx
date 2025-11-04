@@ -17,7 +17,7 @@ export default function PageMain() {
     useState<Participant | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [seed, setSeed] = useState(() => Math.floor(Math.random() * 100000));
+  const [seed, setSeed] = useState(() => Math.floor(Math.random() * 120000));
   const [hasResult, setHasResult] = useState(false);
   const [hasIntroPlayed, setHasIntroPlayed] = useState(false);
   const [isCarouselVisible, setIsCarouselVisible] = useState(false);
@@ -85,7 +85,7 @@ export default function PageMain() {
     setIsCarouselVisible(false);
     setHasIntroPlayed(false);
     setIsCloudConverging(false);
-    setSeed(Math.floor(Math.random() * 100000));
+    setSeed(Math.floor(Math.random() * 120000));
     setCarouselKey((previous) => previous + 1);
   };
 
@@ -97,7 +97,7 @@ export default function PageMain() {
     setIsSpinning(true);
     setShowConfetti(false);
     setHasResult(false);
-    setSeed(Math.floor(Math.random() * 100000));
+    setSeed(Math.floor(Math.random() * 120000));
 
     try {
       // Chama a API do sorteio (POST vazio)

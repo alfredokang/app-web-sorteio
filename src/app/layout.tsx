@@ -24,8 +24,6 @@ export const metadata: Metadata = {
     "rifas",
     "SorteZapp",
     "sorteio via WhatsApp",
-    "hospedagem acessível",
-    "paraolímpicos",
     "sorteios automáticos",
   ],
   openGraph: {

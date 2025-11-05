@@ -16,7 +16,7 @@ const SPIN_DURATION = 10000; // continua passando pro <Carousel3D />
 const EXTRA_SPIN_AFTER_WINNER_MS = 10000;
 
 // Quanto tempo depois de parar a roleta o webhook será enviado (useEffect)
-const WEBHOOK_DELAY = 10000;
+const WEBHOOK_DELAY = 2000;
 
 export default function PageMain() {
   const [participants, setParticipants] = useState<Participant[]>([]);

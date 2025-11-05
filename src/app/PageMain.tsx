@@ -9,8 +9,14 @@ import { Participant } from "./components/types";
 import { firestore } from "@/firebase/client";
 import { collection, getDocs, query, where } from "firebase/firestore";
 
-const SPIN_DURATION = 10000; // 10 segundos
-const WEBHOOK_DELAY = 10000; // 10 segundos
+// Duração apenas da animação interna do Carousel (não controla quando parar)
+const SPIN_DURATION = 10000; // continua passando pro <Carousel3D />
+
+// Tempo extra que a roleta continua girando APÓS o vencedor chegar
+const EXTRA_SPIN_AFTER_WINNER_MS = 10000;
+
+// Quanto tempo depois de parar a roleta o webhook será enviado (useEffect)
+const WEBHOOK_DELAY = 10000;
 
 export default function PageMain() {
   const [participants, setParticipants] = useState<Participant[]>([]);
@@ -83,13 +89,17 @@ export default function PageMain() {
         if (response.ok) {
           setHasSentWebhook(true);
         } else {
-          console.error("Erro ao enviar webhook:", await response.text());
+          console.error(
+            "Erro ao enviar webhook do vencedor:",
+            await response.text()
+          );
         }
       } catch (error) {
-        console.error("Erro ao disparar webhook:", error);
+        console.error("Erro ao disparar webhook do vencedor:", error);
       }
-    }, WEBHOOK_DELAY); // dispara 10s após o confete aparecer
+    }, WEBHOOK_DELAY);
 
+    // Limpa timeout se o componente for desmontado antes de enviar
     return () => clearTimeout(delay);
   }, [hasResult, winnerParticipant, hasSentWebhook]);
 
@@ -122,18 +132,18 @@ export default function PageMain() {
   const handleStart = async () => {
     if (isButtonDisabled) return;
 
-    // Reseta timeouts e estados
+    // Limpa timeouts e reseta
     if (spinTimeout.current) clearTimeout(spinTimeout.current);
     if (revealTimeout.current) clearTimeout(revealTimeout.current);
 
-    setIsSpinning(true); // começa a girar IMEDIATAMENTE
+    setIsSpinning(true); // 🌀 começa a girar IMEDIATAMENTE
     setShowConfetti(false);
     setHasResult(false);
     setSeed(Math.floor(Math.random() * 100000));
     setHasSentWebhook(false);
 
     try {
-      // Chama a API de sorteio enquanto a roleta já está girando
+      // Chama a API ENQUANTO a roleta já está girando
       const response = await fetch(
         "https://webhook.mindbyte.com.br/webhook/sorteia-participante",
         {
@@ -153,21 +163,34 @@ export default function PageMain() {
 
       if (data) {
         const winnerData = data as Participant;
-        setWinnerParticipant(winnerData);
 
-        // Atualiza lista local (opcional)
+        // Define vencedor e atualiza lista
+        setWinnerParticipant(winnerData);
         setParticipants((prev) => [
           ...prev.filter((p) => p.id !== winnerData.id),
           winnerData,
         ]);
 
-        // Continua girando mais 10s APÓS receber o vencedor
+        // Mostra o carrossel se ainda não tiver mostrado a intro
+        if (!hasIntroPlayed) {
+          setIsCloudConverging(true);
+          if (revealTimeout.current) clearTimeout(revealTimeout.current);
+          revealTimeout.current = setTimeout(() => {
+            setIsCloudConverging(false);
+            setHasIntroPlayed(true);
+            setIsCarouselVisible(true);
+          }, 1100);
+        } else {
+          setIsCarouselVisible(true);
+        }
+
+        // 🔥 SEGREDO: só para a roleta 10s DEPOIS que o vencedor chegou
         if (spinTimeout.current) clearTimeout(spinTimeout.current);
         spinTimeout.current = setTimeout(() => {
           setIsSpinning(false);
           setHasResult(true);
           setShowConfetti(true);
-        }, 10000); // 10 segundos extras após o vencedor chegar
+        }, EXTRA_SPIN_AFTER_WINNER_MS);
       }
     } catch (error) {
       console.error("Erro ao chamar webhook de sorteio:", error);

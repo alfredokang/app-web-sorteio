@@ -227,8 +227,12 @@ export default function PageMain() {
   };
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col overflow-hidden">
-      <div className="pointer-events-none absolute -top-40 left-1/2 h-[640px] w-[640px] -translate-x-1/2 rounded-full bg-indigo-500/20 blur-3xl" />
+    <div className="relative flex min-h-screen w-full flex-col overflow-hidden bg-slate-950">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-48 left-[18%] h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-emerald-500/20 blur-3xl" />
+        <div className="absolute bottom-[-20%] right-[12%] h-[640px] w-[640px] translate-x-1/3 rounded-full bg-lime-500/15 blur-[200px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(34,197,94,0.12),transparent_55%)]" />
+      </div>
       <button
         type="button"
         onClick={handleLogout}

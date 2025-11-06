@@ -8,238 +8,250 @@ interface Carousel3DProps {
   participants: Participant[];
   isSpinning: boolean;
   winnerParticipant: Participant | null;
-  spinDuration?: number;
+  spinDuration: number;
 }
 
-const TOTAL_ROTATIONS = 8;
-const MAX_SLOT_COUNT = 8;
-
-const modulo = (value: number, divisor: number) => {
-  if (divisor === 0) {
-    return 0;
-  }
-
-  const remainder = value % divisor;
-  return remainder < 0 ? remainder + divisor : remainder;
-};
-
-const resolveFrontStep = (rotation: number, anglePerCard: number) => {
-  if (anglePerCard === 0) {
-    return 0;
-  }
-
-  const stepExact = -rotation / anglePerCard;
-  return stepExact >= 0 ? Math.floor(stepExact) : Math.ceil(stepExact);
-};
+interface PositionedCard {
+  participant: Participant;
+  angle: number;
+  radius: number;
+  depth: number;
+  scale: number;
+  x: number;
+  y: number;
+  z: number;
+}
 
 export function Carousel3D({
   participants,
   isSpinning,
   winnerParticipant,
-  spinDuration = 10000,
+  spinDuration,
 }: Carousel3DProps) {
+  const [isInitialized, setIsInitialized] = useState(false);
   const [rotation, setRotation] = useState(0);
-  const animationRef = useRef<number | null>(null);
-  const startTimestamp = useRef<number | null>(null);
-  const alignmentRef = useRef<number | null>(null);
+  const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
+  const [activeCardId, setActiveCardId] = useState<string | null>(null);
+  const [isArcLayout, setIsArcLayout] = useState(false);
+  const rotationRef = useRef(rotation);
+  const targetRotationRef = useRef(rotation);
+  const animationFrameRef = useRef<number | null>(null);
 
-  const totalParticipants = participants.length;
-  const slotCount =
-    totalParticipants > MAX_SLOT_COUNT ? MAX_SLOT_COUNT : totalParticipants;
-
-  const anglePerCard = useMemo(() => {
-    return slotCount > 0 ? 360 / slotCount : 0;
-  }, [slotCount]);
-
-  useEffect(() => {
-    if (!isSpinning || totalParticipants === 0) {
-      return;
+  const cards = useMemo(() => {
+    if (!participants.length) {
+      return [];
     }
 
-    cancelAnimationFrame(animationRef.current ?? 0);
-    startTimestamp.current = null;
+    const radius = participants.length < 8 ? 280 : 360;
+    const cardAngle = 360 / participants.length;
 
-    const animate = (timestamp: number) => {
-      if (startTimestamp.current === null) {
-        startTimestamp.current = timestamp;
-      }
+    return participants.map<PositionedCard>((participant, index) => {
+      const baseAngle = index * cardAngle;
+      const angleInRadians = (baseAngle * Math.PI) / 180;
+      const depth = Math.sin(angleInRadians);
+      const scale = 0.75 + 0.25 * (depth + 1) * 0.5;
+      const offsetRadius = radius * (0.7 + depth * 0.3);
 
-      const elapsed = timestamp - startTimestamp.current;
-      const clamped = Math.min(elapsed, spinDuration);
-      const progress = clamped / spinDuration;
-      const easeOut = 1 - Math.pow(1 - progress, 3);
-      const currentRotation = easeOut * TOTAL_ROTATIONS * 360;
-      setRotation(-currentRotation);
-
-      if (elapsed < spinDuration) {
-        animationRef.current = requestAnimationFrame(animate);
-      }
-    };
-
-    animationRef.current = requestAnimationFrame(animate);
-
-    return () => {
-      cancelAnimationFrame(animationRef.current ?? 0);
-    };
-  }, [isSpinning, spinDuration, totalParticipants]);
+      return {
+        participant,
+        angle: baseAngle,
+        radius: offsetRadius,
+        depth,
+        scale,
+        x: Math.cos(angleInRadians) * offsetRadius,
+        y: Math.sin(angleInRadians) * offsetRadius * 0.2,
+        z: depth * 200,
+      };
+    });
+  }, [participants]);
 
   useEffect(() => {
-    if (
-      isSpinning ||
-      !winnerParticipant ||
-      totalParticipants === 0 ||
-      anglePerCard === 0
-    ) {
+    setIsArcLayout(participants.length < 4);
+  }, [participants.length]);
+
+  useEffect(() => {
+    rotationRef.current = rotation;
+  }, [rotation]);
+
+  useEffect(() => {
+    const targetParticipant = winnerParticipant ?? participants[0];
+
+    if (!targetParticipant) {
       return;
     }
 
     const targetIndex = participants.findIndex(
-      (p) => p.id === winnerParticipant.id
+      (participant) => participant.id === targetParticipant.id,
     );
-    if (targetIndex === -1) return;
 
-    cancelAnimationFrame(alignmentRef.current ?? 0);
-    alignmentRef.current = requestAnimationFrame(() => {
-      setRotation((previous) => {
-        if (anglePerCard === 0 || totalParticipants === 0) {
-          return previous;
-        }
+    if (targetIndex === -1) {
+      return;
+    }
 
-        const currentStepPrecise = -previous / anglePerCard;
-        let desiredStep = targetIndex;
+    const targetAngle = targetIndex * (360 / participants.length);
+    targetRotationRef.current = isArcLayout ? 0 : -targetAngle;
+    setActiveCardId(targetParticipant.id);
+  }, [participants, winnerParticipant, isArcLayout]);
 
-        if (totalParticipants > 0) {
-          const cycleSpan = totalParticipants;
-          const nearestCycle = Math.round(
-            (currentStepPrecise - targetIndex) / cycleSpan
-          );
-          desiredStep = targetIndex + nearestCycle * cycleSpan;
-        }
+  useEffect(() => {
+    if (!participants.length) {
+      return undefined;
+    }
 
-        return -desiredStep * anglePerCard;
-      });
-    });
+    let startRotation = rotationRef.current;
+    let startTime: number | null = null;
+
+    const animate = (timestamp: number) => {
+      if (startTime === null) {
+        startTime = timestamp;
+      }
+
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / spinDuration, 1);
+      const easing = 1 - Math.pow(1 - progress, 3);
+
+      const targetRotation = targetRotationRef.current;
+      const nextRotation =
+        startRotation + (targetRotation - startRotation) * easing;
+
+      setRotation(nextRotation);
+
+      if (progress < 1) {
+        animationFrameRef.current = requestAnimationFrame(animate);
+      }
+    };
+
+    if (isSpinning) {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+
+      startRotation = rotationRef.current;
+      startTime = null;
+      animationFrameRef.current = requestAnimationFrame(animate);
+    }
 
     return () => {
-      cancelAnimationFrame(alignmentRef.current ?? 0);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
     };
-  }, [
-    anglePerCard,
-    isSpinning,
-    participants,
-    totalParticipants,
-    winnerParticipant,
-  ]);
+  }, [isSpinning, spinDuration, participants.length]);
 
-  const radius = 320;
-  const hideUnderside = slotCount > 7 && !isSpinning;
-  const maxVisibleStep = hideUnderside ? 3 : slotCount / 2;
-  const fadeWidthInSteps = hideUnderside ? 0.5 : 0;
-
-  if (totalParticipants === 0) {
-    return (
-      <div className="flex h-96 w-full items-center justify-center rounded-3xl border border-white/10 bg-white/5 text-sm text-zinc-300">
-        Carregando participantes...
-      </div>
-    );
-  }
-
-  const frontStep = resolveFrontStep(rotation, anglePerCard);
-  const frontSlotIndex = slotCount > 0 ? modulo(frontStep, slotCount) : 0;
-  const frontParticipantIndex = modulo(frontStep, totalParticipants);
-
-  const cardElements = Array.from({ length: slotCount }, (_, slotIndex) => {
-    const slotOffsetRaw = modulo(slotIndex - frontSlotIndex, slotCount);
-    let slotOffset = slotOffsetRaw;
-
-    if (slotCount > 0 && slotOffset > slotCount / 2) {
-      slotOffset -= slotCount;
+  useEffect(() => {
+    if (!isSpinning && !isInitialized && participants.length) {
+      setIsInitialized(true);
     }
+  }, [isSpinning, isInitialized, participants.length]);
 
-    const participantIndex = modulo(
-      frontParticipantIndex + slotOffset,
-      totalParticipants
-    );
-
-    const participant = participants[participantIndex];
-
-    if (!participant) {
-      return null;
-    }
-
-    const isActive =
-      winnerParticipant &&
-      !isSpinning &&
-      participant.id === winnerParticipant.id;
-
-    const depth = radius + (isActive ? 30 : 0);
-    let opacityValue = isActive ? 1 : 0.6;
-
-    if (anglePerCard > 0) {
-      const cardAngle = slotIndex * anglePerCard + rotation;
-      let normalizedAngle = modulo(cardAngle, 360);
-
-      if (normalizedAngle > 180) {
-        normalizedAngle -= 360;
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        if (animationFrameRef.current) {
+          cancelAnimationFrame(animationFrameRef.current);
+        }
       }
+    };
 
-      const stepsFromFront = Math.abs(normalizedAngle) / anglePerCard;
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
-      if (hideUnderside && stepsFromFront > maxVisibleStep + fadeWidthInSteps) {
-        opacityValue = 0;
-      } else if (
-        hideUnderside &&
-        fadeWidthInSteps > 0 &&
-        stepsFromFront > maxVisibleStep
-      ) {
-        const fadeProgress = Math.min(
-          (stepsFromFront - maxVisibleStep) / fadeWidthInSteps,
-          1
-        );
-        opacityValue *= 1 - fadeProgress;
+    return () => {
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibilityChange,
+      );
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
       }
-    }
-
-    const finalOpacity = Math.max(0, opacityValue);
-    const isEffectivelyHidden = finalOpacity <= 0.01;
-
-    return (
-      <div
-        key={`slot-${slotIndex}-${participant.id}`}
-        className="absolute left-1/2 top-1/2 w-64 -translate-x-1/2 -translate-y-1/2"
-        style={{
-          transform: `rotateY(${
-            slotIndex * anglePerCard
-          }deg) translateZ(${depth}px)`,
-          opacity: finalOpacity,
-          visibility: isEffectivelyHidden ? "hidden" : "visible",
-          transition: "opacity 300ms ease",
-        }}
-      >
-        <Card participant={participant} isActive={!!isActive} />
-      </div>
-    );
-  });
+    };
+  }, []);
 
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-visible">
-      <div className="absolute inset-0 rounded-[48px] bg-linear-to-br from-slate-900/80 via-emerald-950/60 to-black/80 blur-3xl" />
+      <div className="absolute inset-0 rounded-[48px] bg-linear-to-br from-slate-900/80 via-indigo-900/60 to-black/80 blur-3xl" />
       <div
         className="relative flex h-full w-full items-center justify-center mt-40 mb-13"
         style={{ perspective: "1200px" }}
       >
         <div
-          className="relative h-[360px] w-[360px] transition-transform duration-500"
-          style={{
-            transformStyle: "preserve-3d",
-            transform: `rotateX(18deg) rotateY(${rotation}deg)`,
-          }}
+          className={`relative flex h-[620px] w-full max-w-[900px] items-center justify-center transition-all duration-1000 ease-out ${
+            isInitialized ? "opacity-100 translate-y-0" : "translate-y-8 opacity-0"
+          }`}
+          style={{ transform: `rotateX(18deg)` }}
         >
-          {cardElements}
+          <div
+            className={`absolute inset-0 rounded-full border border-white/10 bg-linear-to-br from-white/10 via-white/5 to-white/0 blur-3xl transition-opacity duration-700 ${
+              isSpinning ? "opacity-80" : "opacity-40"
+            }`}
+          />
+          <div className="absolute inset-0 rounded-full bg-black/40 blur-3xl" />
+          <div className="absolute inset-0 rounded-full border border-white/5" />
+          <div className="absolute inset-[60px] rounded-full border border-white/5" />
+          <div className="absolute inset-[140px] rounded-full border border-white/5" />
+
+          <div
+            className="relative h-[480px] w-full"
+            style={{ transformStyle: "preserve-3d" }}
+          >
+            <div
+              className="absolute left-1/2 top-1/2 flex h-1 w-1 -translate-x-1/2 -translate-y-1/2"
+              style={{ transform: `rotateZ(0deg) translateZ(-240px)` }}
+            >
+              <span className="animate-ping rounded-full bg-emerald-400/60" />
+            </div>
+
+            <div
+              className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2"
+              style={{ transform: `rotateZ(${rotation}deg)` }}
+            >
+              {cards.map((card) => {
+                const isActive = activeCardId === card.participant.id;
+                const isHovered = hoveredCardId === card.participant.id;
+                const depthFactor = (card.depth + 1) / 2;
+                const cardScale = isHovered ? card.scale + 0.08 : card.scale;
+
+                const transform = isArcLayout
+                  ? `translate3d(${card.x * 0.9}px, ${
+                      card.y + (isHovered ? -20 : 0)
+                    }px, ${card.z}px)`
+                  : `rotateY(${card.angle}deg) translateZ(${card.radius}px) translateY(${card.y}px)`;
+
+                return (
+                  <div
+                    key={card.participant.id}
+                    className={`absolute left-1/2 top-1/2 h-[300px] w-[220px] -translate-x-1/2 -translate-y-1/2 transition-[transform,opacity,filter] duration-700 ease-out ${
+                      isArcLayout ? "origin-bottom" : "origin-center"
+                    } ${
+                      isActive
+                        ? "z-20 opacity-100"
+                        : `z-10 opacity-${Math.max(30, Math.round(40 + depthFactor * 40))}`
+                    }`}
+                    style={{
+                      transform,
+                      transformStyle: "preserve-3d",
+                      transitionDelay: isArcLayout ? `${Math.abs(card.depth) * 120}ms` : undefined,
+                    }}
+                    onMouseEnter={() => setHoveredCardId(card.participant.id)}
+                    onMouseLeave={() => setHoveredCardId((previous) =>
+                      previous === card.participant.id ? null : previous,
+                    )}
+                  >
+                    <div
+                      className={`transform-gpu transition-[transform,filter] duration-500 ${
+                        isHovered ? "scale-[1.06]" : `scale-[${cardScale}]`
+                      } ${isActive ? "drop-shadow-[0_20px_45px_rgba(16,185,129,0.45)]" : "drop-shadow-[0_12px_25px_rgba(2,6,23,0.45)]"}`}
+                    >
+                      <Card participant={card.participant} isActive={isActive} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
-      <div className="absolute inset-0 rounded-[48px] border border-emerald-400/25" />
-      <div className="pointer-events-none absolute inset-0 rounded-[48px] bg-linear-to-br from-transparent via-emerald-400/10 to-transparent" />
+      <div className="absolute inset-0 rounded-[48px] border border-white/10" />
+      <div className="pointer-events-none absolute inset-0 rounded-[48px] bg-linear-to-br from-transparent via-white/5 to-transparent" />
     </div>
   );
 }

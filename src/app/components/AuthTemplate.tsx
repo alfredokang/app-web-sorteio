@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ReactNode } from "react";
 
@@ -24,12 +25,20 @@ export function AuthTemplate({
 
       <div className="relative w-full max-w-xl">
         <div className="mb-10 text-center">
-          <h1 className="text-5xl font-semibold font-sans text-blue-300">
+          {/* <h1 className="text-5xl font-semibold font-sans text-blue-300">
             SorteZapp
-          </h1>
-          <p className="mb-10 text-md text-blue-200">
+          </h1> */}
+          <div className="flex justify-center mb-10">
+            <Image
+              src="/images/logo.png"
+              alt="Teste"
+              width={330}
+              height={330}
+            />
+          </div>
+          {/* <p className="mb-10 text-md text-blue-200">
             Sorteios Rápidos e Automáticos pelo WhatsApp
-          </p>
+          </p> */}
           <span className="inline-flex items-center rounded-full border border-white/10 bg-white/10 px-4 py-1 text-xs font-semibold tracking-[0.3em] text-white/70 uppercase">
             Bem-vindo
           </span>

@@ -216,22 +216,14 @@ export function Carousel3D({
           transition: "opacity 300ms ease",
         }}
       >
-        <div
-          className={`transform-gpu transition-transform duration-500 ${
-            isActive
-              ? "scale-[1.03] drop-shadow-[0_24px_55px_rgba(16,185,129,0.45)]"
-              : "scale-100 drop-shadow-[0_18px_40px_rgba(2,6,23,0.55)] hover:scale-[1.02]"
-          }`}
-        >
-          <Card participant={participant} isActive={!!isActive} />
-        </div>
+        <Card participant={participant} isActive={!!isActive} />
       </div>
     );
   });
 
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-visible">
-      <div className="absolute inset-0 rounded-[48px] bg-linear-to-br from-emerald-950/40 via-slate-950/70 to-black/90 blur-3xl" />
+      <div className="absolute inset-0 rounded-[48px] bg-linear-to-br from-slate-900/80 via-indigo-900/60 to-black/80 blur-3xl" />
       <div
         className="relative flex h-full w-full items-center justify-center mt-40 mb-13"
         style={{ perspective: "1200px" }}
@@ -243,15 +235,11 @@ export function Carousel3D({
             transform: `rotateX(18deg) rotateY(${rotation}deg)`,
           }}
         >
-          <div className="pointer-events-none absolute inset-[-40px] rounded-full border border-emerald-400/15" />
-          <div className="pointer-events-none absolute inset-[-80px] rounded-full bg-emerald-500/10 blur-3xl" />
-          <div className="pointer-events-none absolute left-1/2 top-1/2 h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-400/20 blur-xl" />
-          <span className="pointer-events-none absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-300/70" />
           {cardElements}
         </div>
       </div>
       <div className="absolute inset-0 rounded-[48px] border border-white/10" />
-      <div className="pointer-events-none absolute inset-0 rounded-[48px] bg-linear-to-br from-transparent via-emerald-500/5 to-transparent" />
+      <div className="pointer-events-none absolute inset-0 rounded-[48px] bg-linear-to-br from-transparent via-white/5 to-transparent" />
     </div>
   );
 }

@@ -18,9 +18,9 @@ export function AuthTemplate({
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-24">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-[12%] top-[12%] h-64 w-64 rounded-full bg-sky-500/25 blur-3xl" />
-        <div className="absolute bottom-[10%] right-[8%] h-72 w-72 rounded-full bg-rose-500/20 blur-[120px]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_100%,rgba(236,72,153,0.12),transparent_55%)]" />
+        <div className="absolute left-[12%] top-[12%] h-64 w-64 rounded-full bg-emerald-500/25 blur-3xl" />
+        <div className="absolute bottom-[10%] right-[8%] h-72 w-72 rounded-full bg-lime-500/20 blur-[120px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_100%,rgba(74,222,128,0.12),transparent_55%)]" />
       </div>
 
       <div className="relative w-full max-w-xl">
@@ -58,7 +58,7 @@ export function AuthTemplate({
           <span className="text-white/70 font-semibold">
             Aumente suas vendas com sorteios automáticos. Chama no Zapp!
           </span>
-          <span className="block mt-1 text-blue-300 underline font-semibold">
+          <span className="block mt-1 text-emerald-300 underline font-semibold">
             <Link href="#">Saiba Mais</Link>
           </span>
         </div>

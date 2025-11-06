@@ -104,7 +104,7 @@ export default function LoginPage() {
           Ainda não tem uma conta?{" "}
           <Link
             href="/signup"
-            className="font-semibold text-sky-300 hover:text-sky-200"
+            className="font-semibold text-emerald-300 hover:text-emerald-200"
           >
             Criar cadastro
           </Link>
@@ -121,7 +121,7 @@ export default function LoginPage() {
             type="email"
             inputMode="email"
             placeholder="nome@empresa.com"
-            className="w-full rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-base text-white placeholder:text-white/40 transition focus:border-sky-400/60 focus:outline-none focus:ring-2 focus:ring-sky-500/40"
+            className="w-full rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-base text-white placeholder:text-white/40 transition focus:border-emerald-400/60 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
             {...register("email", {
               required: "Informe seu e-mail",
               pattern: {
@@ -147,7 +147,7 @@ export default function LoginPage() {
             id="password"
             type="password"
             placeholder="Digite sua senha"
-            className="w-full rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-base text-white placeholder:text-white/40 transition focus:border-sky-400/60 focus:outline-none focus:ring-2 focus:ring-sky-500/40"
+            className="w-full rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-base text-white placeholder:text-white/40 transition focus:border-emerald-400/60 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
             {...register("password", {
               required: "Informe sua senha",
               minLength: {
@@ -164,7 +164,7 @@ export default function LoginPage() {
 
         <button
           type="submit"
-          className="cursor-pointer flex w-full items-center justify-center rounded-2xl bg-linear-to-r from-sky-500 via-indigo-500 to-purple-500 px-6 py-3 text-base font-semibold text-white shadow-[0_15px_35px_rgba(37,99,235,0.35)] transition hover:shadow-[0_20px_45px_rgba(59,130,246,0.45)] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-200 disabled:cursor-not-allowed disabled:opacity-70"
+          className="cursor-pointer flex w-full items-center justify-center rounded-2xl bg-linear-to-r from-emerald-500 via-green-500 to-lime-500 px-6 py-3 text-base font-semibold text-white shadow-[0_15px_35px_rgba(16,185,129,0.35)] transition hover:shadow-[0_20px_45px_rgba(34,197,94,0.45)] focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200 disabled:cursor-not-allowed disabled:opacity-70"
           disabled={isSubmitting}
         >
           {isSubmitting ? "Entrando..." : "Entrar"}

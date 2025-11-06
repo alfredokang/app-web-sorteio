@@ -6,6 +6,7 @@ export type Participant = {
     formatName: string;
   };
   avatar: "Masculino" | "Feminino" | string;
+  avatarUrl: string;
   cpfCliente: string;
   phone: {
     phoneWithoutCode: string;

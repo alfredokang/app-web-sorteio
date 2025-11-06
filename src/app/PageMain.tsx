@@ -211,16 +211,18 @@ export default function PageMain() {
   const buttonClassName = [
     baseButtonClasses,
     isResetAvailable
-      ? "bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-500 text-slate-900 shadow-[0_22px_60px_rgba(16,185,129,0.35)] hover:shadow-[0_28px_80px_rgba(6,182,212,0.45)] disabled:opacity-60 disabled:shadow-none"
-      : "bg-white/95 text-slate-900 hover:shadow-[0_20px_60px_rgba(148,163,184,0.35)] disabled:bg-white/20 disabled:text-white/50 disabled:shadow-none",
+      ? "bg-gradient-to-r from-emerald-400 via-lime-400 to-green-500 text-slate-900 shadow-[0_22px_60px_rgba(34,197,94,0.35)] hover:shadow-[0_28px_80px_rgba(134,239,172,0.45)] disabled:opacity-60 disabled:shadow-none"
+      : isSpinning
+      ? "bg-emerald-500/15 text-emerald-100 shadow-[0_18px_48px_rgba(6,95,70,0.35)] disabled:opacity-60 disabled:shadow-none"
+      : "bg-gradient-to-r from-emerald-500 via-emerald-400 to-lime-400 text-slate-900 shadow-[0_20px_60px_rgba(16,185,129,0.35)] hover:shadow-[0_26px_78px_rgba(101,163,13,0.42)]",
   ].join(" ");
   const buttonIconClassName = [
     "flex h-9 w-9 items-center justify-center rounded-full text-lg transition duration-300 group-hover:scale-110",
-    isSpinning
-      ? "bg-slate-900 text-white shadow-[0_8px_20px_rgba(15,23,42,0.45)]"
-      : isResetAvailable
-      ? "bg-white/90 text-slate-900 shadow-[0_14px_30px_rgba(16,185,129,0.35)] group-hover:bg-white"
-      : "bg-slate-900 text-white shadow-[0_12px_30px_rgba(15,23,42,0.4)] group-hover:bg-slate-800",
+    isResetAvailable
+      ? "bg-white/90 text-emerald-700 shadow-[0_14px_30px_rgba(74,222,128,0.45)] group-hover:bg-white"
+      : isSpinning
+      ? "bg-emerald-500/20 text-emerald-100 shadow-[0_10px_28px_rgba(6,95,70,0.4)]"
+      : "bg-emerald-600 text-emerald-50 shadow-[0_12px_32px_rgba(16,185,129,0.45)] group-hover:bg-emerald-500",
   ].join(" ");
   const handleLogout = () => {
     signOut({ callbackUrl: "/login" });
@@ -228,18 +230,22 @@ export default function PageMain() {
 
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-hidden">
-      <div className="pointer-events-none absolute -top-40 left-1/2 h-[640px] w-[640px] -translate-x-1/2 rounded-full bg-indigo-500/20 blur-3xl" />
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-44 left-1/2 h-[640px] w-[640px] -translate-x-1/2 rounded-full bg-emerald-500/25 blur-3xl" />
+        <div className="absolute -bottom-56 right-0 h-[520px] w-[520px] translate-x-1/3 rounded-full bg-lime-500/20 blur-[160px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_22%,rgba(52,211,153,0.14),transparent_60%)]" />
+      </div>
       <button
         type="button"
         onClick={handleLogout}
-        className="absolute right-6 top-6 z-30 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium text-white/70 backdrop-blur transition hover:bg-white/20 hover:text-white cursor-pointer"
+        className="absolute right-6 top-6 z-30 rounded-full border border-emerald-300/40 bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-100 backdrop-blur transition hover:bg-emerald-500/20 hover:text-emerald-50 cursor-pointer"
       >
         Sair
       </button>
       <ConfettiOverlay isVisible={showConfetti} seed={seed} />
       <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col px-6 pb-24 pt-24">
         <header className="flex flex-col gap-6 text-center lg:text-left">
-          <span className="mx-auto rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium uppercase tracking-[0.3em] text-white/70 lg:mx-0">
+          <span className="mx-auto rounded-full border border-emerald-300/40 bg-emerald-500/10 px-4 py-2 text-sm font-medium uppercase tracking-[0.3em] text-emerald-200/80 lg:mx-0">
             Sorteio Premium de Café
           </span>
           <h1 className="text-4xl font-semibold leading-tight text-white sm:text-5xl lg:text-6xl">
@@ -260,7 +266,7 @@ export default function PageMain() {
               <span className={buttonIconClassName}>{buttonIcon}</span>
               {buttonLabel}
             </button>
-            <span className="text-sm text-white/60">
+            <span className="text-sm text-emerald-100/70">
               {isSpinning
                 ? "A roleta vai revelar o vencedor em instantes."
                 : isResetAvailable
@@ -298,7 +304,7 @@ export default function PageMain() {
                 />
               ) : (
                 <div className="flex justify-center">
-                  <span className="text-sm text-white/60">
+                  <span className="text-sm text-emerald-100/70">
                     Carregando participantes, aguarde...
                   </span>
                 </div>
@@ -306,7 +312,7 @@ export default function PageMain() {
             </div>
           </div>
 
-          <div className="flex w-full max-w-3xl flex-col items-center gap-4 rounded-3xl border border-white/10 bg-white/5 p-8 text-center backdrop-blur">
+          <div className="flex w-full max-w-3xl flex-col items-center gap-4 rounded-3xl border border-emerald-400/20 bg-emerald-500/10 p-8 text-center backdrop-blur">
             <p className="text-sm font-semibold uppercase tracking-[0.4em] text-emerald-300/80">
               {hasResult
                 ? "Vencedor Confirmado"

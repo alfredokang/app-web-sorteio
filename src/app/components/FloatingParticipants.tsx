@@ -61,7 +61,7 @@ export function FloatingParticipants({
       const scale = randomInRange(baseSeed + 7, 0.65, 0.95);
       const scaleMid = scale + randomInRange(baseSeed + 8, 0.05, 0.12);
       const rotation = randomInRange(baseSeed + 9, -12, 12);
-      const hue = randomInRange(baseSeed + 10, 180, 320);
+      const hue = randomInRange(baseSeed + 10, 132, 168);
       const opacity = randomInRange(baseSeed + 11, 0.55, 0.95);
       const zIndex = Math.round(randomInRange(baseSeed + 12, 10, 60));
 
@@ -120,14 +120,14 @@ export function FloatingParticipants({
             >
               <div className="floating-card-inner">
                 <div className="flex items-center gap-2">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900/70 text-[11px] font-semibold text-white/80">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full border border-emerald-300/50 bg-emerald-500/25 text-[11px] font-semibold text-emerald-50">
                     {participant.name.formatFullName.slice(0, 1).toUpperCase()}
                   </span>
                   <div className="flex min-w-0 flex-col">
-                    <span className="truncate text-xs font-medium text-white/90 max-w-[150px]">
+                    <span className="truncate text-xs font-medium text-emerald-50 max-w-[150px]">
                       {participant.name.formatFullName}
                     </span>
-                    <span className="floating-card-comment text-[10px] text-white/70">
+                    <span className="floating-card-comment text-[10px] text-emerald-100/80">
                       {participant.questionThree.followUp}
                     </span>
                   </div>

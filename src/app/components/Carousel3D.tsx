@@ -138,7 +138,7 @@ export function Carousel3D({
 
   if (totalParticipants === 0) {
     return (
-      <div className="flex h-96 w-full items-center justify-center rounded-3xl border border-white/10 bg-white/5 text-sm text-zinc-300">
+      <div className="flex h-96 w-full items-center justify-center rounded-3xl border border-white/10 bg-white/5 text-sm text-emerald-300">
         Carregando participantes...
       </div>
     );
@@ -223,7 +223,7 @@ export function Carousel3D({
 
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-visible">
-      <div className="absolute inset-0 rounded-[48px] bg-linear-to-br from-slate-900/80 via-indigo-900/60 to-black/80 blur-3xl" />
+      <div className="absolute inset-0 rounded-[48px] bg-linear-to-br from-emerald-950/80 via-emerald-900/60 to-black/80 blur-3xl" />
       <div
         className="relative flex h-full w-full items-center justify-center mt-40 mb-13"
         style={{ perspective: "1200px" }}

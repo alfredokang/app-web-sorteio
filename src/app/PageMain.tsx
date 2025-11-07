@@ -228,7 +228,7 @@ export default function PageMain() {
 
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-hidden">
-      <div className="pointer-events-none absolute -top-40 left-1/2 h-[640px] w-[640px] -translate-x-1/2 rounded-full bg-indigo-500/20 blur-3xl" />
+      <div className="pointer-events-none absolute -top-40 left-1/2 h-[640px] w-[640px] -translate-x-1/2 rounded-full bg-emerald-600/20 blur-3xl" />
       <button
         type="button"
         onClick={handleLogout}

@@ -3,10 +3,10 @@ import LoadingSpinner from "@/app/components/LoadingSpinner2";
 export default function Loading() {
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <div role="status" className="flex items-center">
+      <div role="status" className="flex items-center gap-3">
         <svg
           aria-hidden="true"
-          className="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-emerald-500"
+          className="w-8 h-8 animate-spin text-gray-600 fill-emerald-500"
           viewBox="0 0 100 101"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -20,7 +20,9 @@ export default function Loading() {
             fill="currentFill"
           />
         </svg>
-        <span className="ml-2">Carregando participantes...</span>
+        <span className="text-emerald-100/90 text-sm font-medium tracking-wide">
+          Carregando participantes...
+        </span>
       </div>
     </div>
   );

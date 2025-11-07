@@ -47,7 +47,8 @@ export function FloatingParticipants({
   participants,
   isVisible,
   isConverging,
-}: FloatingParticipantsProps) {
+  className,
+}: FloatingParticipantsProps & { className?: string }) {
   const layouts = useMemo(() => {
     return participants.map<ParticipantLayout>((participant, index) => {
       const baseSeed =
@@ -91,7 +92,7 @@ export function FloatingParticipants({
     <div
       className={`pointer-events-none absolute inset-0 flex items-center justify-center overflow-visible transition-opacity duration-700 ease-out ${
         isVisible || isConverging ? "opacity-100" : "opacity-0"
-      }`}
+      } ${className || ""}`}
       aria-hidden
     >
       <div className="relative h-full w-full">

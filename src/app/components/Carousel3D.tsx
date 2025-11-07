@@ -225,7 +225,7 @@ export function Carousel3D({
     <div className="relative flex h-full w-full items-center justify-center overflow-visible">
       <div className="absolute inset-0 rounded-[48px] bg-linear-to-br from-emerald-950/80 via-emerald-900/60 to-black/80 blur-3xl" />
       <div
-        className="relative flex h-full w-full items-center justify-center mt-40 mb-13"
+        className="relative flex h-full w-full items-center justify-center mt-35 mb-10"
         style={{ perspective: "1200px" }}
       >
         <div

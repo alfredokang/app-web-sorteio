@@ -143,7 +143,6 @@ export default function PageMain() {
     setHasSentWebhook(false);
 
     try {
-      // Chama a API ENQUANTO a roleta já está girando
       const response = await fetch(
         "https://webhook.mindbyte.com.br/webhook/sorteia-participante",
         {
@@ -152,26 +151,30 @@ export default function PageMain() {
         }
       );
 
-      const data = await response.json();
+      // 🔒 Protege contra corpo vazio ou não JSON
+      let data: any = null;
+      try {
+        const text = await response.text();
+        data = text ? JSON.parse(text) : null;
+      } catch {
+        data = null;
+      }
 
       if (!response.ok) {
         console.error("Erro na API:", data);
-        alert(data.message || "Erro ao sortear participante.");
+        alert(data?.message || "Erro ao sortear participante.");
         setIsSpinning(false);
         return;
       }
 
       if (data) {
         const winnerData = data as Participant;
-
-        // Define vencedor e atualiza lista
         setWinnerParticipant(winnerData);
         setParticipants((prev) => [
           ...prev.filter((p) => p.id !== winnerData.id),
           winnerData,
         ]);
 
-        // Mostra o carrossel se ainda não tiver mostrado a intro
         if (!hasIntroPlayed) {
           setIsCloudConverging(true);
           if (revealTimeout.current) clearTimeout(revealTimeout.current);
@@ -184,13 +187,15 @@ export default function PageMain() {
           setIsCarouselVisible(true);
         }
 
-        // 🔥 SEGREDO: só para a roleta 10s DEPOIS que o vencedor chegou
         if (spinTimeout.current) clearTimeout(spinTimeout.current);
         spinTimeout.current = setTimeout(() => {
           setIsSpinning(false);
           setHasResult(true);
           setShowConfetti(true);
         }, EXTRA_SPIN_AFTER_WINNER_MS);
+      } else {
+        console.warn("⚠️ Nenhum dado retornado do webhook.");
+        setIsSpinning(false);
       }
     } catch (error) {
       console.error("Erro ao chamar webhook de sorteio:", error);

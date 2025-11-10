@@ -5,7 +5,7 @@ export type Participant = {
     formatSurname: string;
     formatName: string;
   };
-  avatar: "Masculino" | "Feminino" | string;
+  avatar: "male" | "female" | "neutral" | string;
   avatarUrl: string;
   cpfCliente: string;
   phone: {

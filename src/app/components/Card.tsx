@@ -38,10 +38,7 @@ export function Card({ participant, isActive = false }: CardProps) {
         <div className="flex items-center gap-4">
           <div className="relative h-16 w-16 overflow-hidden rounded-2xl border border-white/20 bg-white/5">
             <Image
-              src={
-                avatarByGender[participant.avatar || "Masculino"] ||
-                "/avatars/male.svg"
-              }
+              src={participant?.avatarUrl || "/avatars/male.svg"}
               alt={`Avatar de ${participant.name}`}
               fill
               className="object-cover"

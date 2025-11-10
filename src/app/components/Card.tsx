@@ -8,16 +8,36 @@ interface CardProps {
   isActive?: boolean;
 }
 
-const avatarByGender: Record<Participant["avatar"], string> = {
-  Masculino: "/avatars/male.svg",
-  Feminino: "/avatars/female.svg",
-};
+const FALLBACK_AVATAR = "/avatars/male.svg";
+
+function getAvatarSrc(participant: Participant) {
+  const fromAvatarUrl = participant.avatarUrl?.trim();
+  if (fromAvatarUrl) {
+    return fromAvatarUrl;
+  }
+
+  const avatarValue =
+    typeof participant.avatar === "string" ? participant.avatar.trim() : "";
+
+  if (
+    avatarValue &&
+    (avatarValue.startsWith("http://") ||
+      avatarValue.startsWith("https://") ||
+      avatarValue.startsWith("/"))
+  ) {
+    return avatarValue;
+  }
+
+  return FALLBACK_AVATAR;
+}
 
 export function Card({ participant, isActive = false }: CardProps) {
   const stars = Array.from(
     { length: 5 },
     (_, index) => index < participant?.questionThree?.minasCafeRate
   );
+
+  const avatarSrc = getAvatarSrc(participant);
 
   return (
     <div
@@ -38,8 +58,8 @@ export function Card({ participant, isActive = false }: CardProps) {
         <div className="flex items-center gap-4">
           <div className="relative h-16 w-16 overflow-hidden rounded-2xl border border-white/20 bg-white/5">
             <Image
-              src={participant?.avatarUrl || "/avatars/male.svg"}
-              alt={`Avatar de ${participant.name}`}
+              src={avatarSrc}
+              alt={`Avatar de ${participant.name.formatFullName}`}
               fill
               className="object-cover"
               sizes="64px"

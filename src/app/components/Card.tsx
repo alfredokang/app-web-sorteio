@@ -8,11 +8,6 @@ interface CardProps {
   isActive?: boolean;
 }
 
-const avatarByGender: Record<Participant["avatar"], string> = {
-  Masculino: "/avatars/male.svg",
-  Feminino: "/avatars/female.svg",
-};
-
 export function Card({ participant, isActive = false }: CardProps) {
   const stars = Array.from(
     { length: 5 },

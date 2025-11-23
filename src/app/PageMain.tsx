@@ -245,10 +245,10 @@ export default function PageMain() {
       <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col px-6 pb-24 pt-24">
         <header className="flex flex-col gap-6 text-center lg:text-left">
           <span className="mx-auto rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium uppercase tracking-[0.3em] text-white/70 lg:mx-0">
-            Sorteio Premium Minas Café
+            Sorteio Exclusivo da Minas Café
           </span>
           <h1 className="text-4xl font-semibold leading-tight text-white sm:text-5xl lg:text-6xl">
-            É hora de revelar o ganhador do kit exclusivo.
+            É hora de revelar o ganhador do kit exclusivo Minas Café
           </h1>
           <p className="mx-auto max-w-3xl text-lg text-zinc-300 lg:mx-0">
             Todos os participantes foram registrados e validados via WhatsApp.

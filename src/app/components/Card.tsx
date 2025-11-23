@@ -51,9 +51,9 @@ export function Card({ participant, isActive = false }: CardProps) {
             </div>
           </div>
         </div>
-        <p className="text-sm text-zinc-200">
+        {/* <p className="text-sm text-zinc-200">
           “{participant.questionThree.followUp}”
-        </p>
+        </p> */}
       </div>
     </div>
   );

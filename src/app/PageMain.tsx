@@ -231,6 +231,8 @@ export default function PageMain() {
     signOut({ callbackUrl: "/login" });
   };
 
+  console.log(winnerParticipant);
+
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-hidden">
       <div className="pointer-events-none absolute -top-40 left-1/2 h-[640px] w-[640px] -translate-x-1/2 rounded-full bg-emerald-600/20 blur-3xl" />
@@ -343,7 +345,7 @@ export default function PageMain() {
                 ? "Todos os participantes carregados"
                 : "Carregando partipantes..."}
             </h2>
-            <p className="max-w-2xl text-base text-zinc-300">
+            <div className="max-w-2xl text-base text-zinc-300">
               {hasResult ? (
                 winnerParticipant?.prize?.id ? (
                   <div className="text-center">
@@ -365,7 +367,7 @@ export default function PageMain() {
               ) : (
                 "Muito obrigado pela participação em nossa pesquisa e desejamos boa sorte a todos os participantes"
               )}
-            </p>
+            </div>
           </div>
         </section>
       </main>

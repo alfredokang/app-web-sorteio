@@ -26,6 +26,11 @@ export type Participant = {
   questionFour: {
     considerExchange?: string;
   };
+  prize: {
+    id: string;
+    title: string;
+    description: string;
+  };
   chosen: boolean;
   createdAt: string;
   updatedAt: string;

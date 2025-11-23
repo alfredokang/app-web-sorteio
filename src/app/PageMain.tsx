@@ -245,15 +245,14 @@ export default function PageMain() {
       <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col px-6 pb-24 pt-24">
         <header className="flex flex-col gap-6 text-center lg:text-left">
           <span className="mx-auto rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium uppercase tracking-[0.3em] text-white/70 lg:mx-0">
-            Sorteio Premium de Café
+            Sorteio Premium Minas Café
           </span>
           <h1 className="text-4xl font-semibold leading-tight text-white sm:text-5xl lg:text-6xl">
-            Prepare-se para descobrir quem leva o kit exclusivo.
+            É hora de revelar o ganhador do kit exclusivo.
           </h1>
           <p className="mx-auto max-w-3xl text-lg text-zinc-300 lg:mx-0">
-            Leads apaixonados por café responderam ao nosso WhatsApp com suas
-            histórias aromáticas. Agora é hora de ver a roleta revelar o grande
-            vencedor ao vivo.
+            Todos os participantes foram registrados e validados via WhatsApp.
+            Agora, acompanhe ao vivo o sorteio e veja a escolha final da roleta.
           </p>
           <div className="mt-4 flex flex-col items-center gap-4 lg:flex-row lg:items-center">
             <button
@@ -345,15 +344,27 @@ export default function PageMain() {
                 : "Carregando partipantes..."}
             </h2>
             <p className="max-w-2xl text-base text-zinc-300">
-              {hasResult
-                ? `${
-                    winnerParticipant?.questionThree?.followUp
-                      ? `${winnerParticipant.questionThree.followUp} — uma história que vale um brinde com o melhor café.`
-                      : "Uma história que vale um brinde com o melhor café."
-                  }`
-                : isCarouselVisible
-                ? "Assim que a roleta parar, anunciaremos o vencedor escolhido."
-                : "Muito obrigado pela participação em nossa pesquisa e desejamos boa sorte a todos os participantes"}
+              {hasResult ? (
+                winnerParticipant?.prize?.id ? (
+                  <div className="text-center">
+                    <div className="text-2xl font-bold mt-3">
+                      {winnerParticipant?.prize?.title}
+                    </div>
+                    <div className="text-lg">
+                      {winnerParticipant?.prize?.description}
+                    </div>
+                    <div className="mt-6">
+                      "CaFÉ Especial, Momento Especial, Pessoas Especiais"
+                    </div>
+                  </div>
+                ) : (
+                  "Uma história que vale um brinde com o melhor café."
+                )
+              ) : isCarouselVisible ? (
+                "Assim que a roleta parar, anunciaremos o vencedor escolhido."
+              ) : (
+                "Muito obrigado pela participação em nossa pesquisa e desejamos boa sorte a todos os participantes"
+              )}
             </p>
           </div>
         </section>

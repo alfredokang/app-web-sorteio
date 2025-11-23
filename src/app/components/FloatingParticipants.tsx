@@ -128,9 +128,9 @@ export function FloatingParticipants({
                     <span className="truncate text-xs font-medium text-white/90 max-w-[150px]">
                       {participant.name.formatFullName}
                     </span>
-                    <span className="floating-card-comment text-[10px] text-white/70">
+                    {/* <span className="floating-card-comment text-[10px] text-white/70">
                       {participant.questionThree.followUp}
-                    </span>
+                    </span> */}
                   </div>
                 </div>
               </div>

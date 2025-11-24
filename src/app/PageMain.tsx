@@ -5,9 +5,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Carousel3D } from "./components/Carousel3D";
 import { ConfettiOverlay } from "./components/ConfettiOverlay";
 import { FloatingParticipants } from "./components/FloatingParticipants";
-import { Participant } from "./components/types";
+import { Participant, Prizes } from "./components/types";
 import { firestore } from "@/firebase/client";
 import { collection, getDocs, query, where } from "firebase/firestore";
+import Image from "next/image";
 
 // Duração apenas da animação interna do Carousel (não controla quando parar)
 const SPIN_DURATION = 10000; // continua passando pro <Carousel3D />
@@ -34,6 +35,7 @@ export default function PageMain() {
   const revealTimeout = useRef<NodeJS.Timeout | null>(null);
   const [reload, setReload] = useState(false);
   const [hasSentWebhook, setHasSentWebhook] = useState(false);
+  const [isDrawPossible, setIsDrawPossible] = useState(true);
 
   // Carrega participantes do Firestore
   useEffect(() => {
@@ -49,7 +51,23 @@ export default function PageMain() {
           ...doc.data(),
         })) as Participant[];
 
-        setParticipants(participantsData);
+        const prizesRef = collection(firestore, "prizes");
+        const q2 = query(prizesRef, where("drawn", "==", false));
+
+        const snapshot2 = await getDocs(q2);
+
+        const prizesData = snapshot2.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as unknown as Prizes[];
+
+        if (prizesData.length > 0) {
+          setIsDrawPossible(true);
+          setParticipants(participantsData);
+        } else {
+          setIsDrawPossible(false);
+          setParticipants([]);
+        }
       } catch (error) {
         console.error("Erro ao carregar participantes:", error);
       }
@@ -231,8 +249,6 @@ export default function PageMain() {
     signOut({ callbackUrl: "/login" });
   };
 
-  console.log(winnerParticipant);
-
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-hidden">
       <div className="pointer-events-none absolute -top-40 left-1/2 h-[640px] w-[640px] -translate-x-1/2 rounded-full bg-emerald-600/20 blur-3xl" />
@@ -245,131 +261,174 @@ export default function PageMain() {
       </button>
       <ConfettiOverlay isVisible={showConfetti} seed={seed} />
       <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col px-6 pb-24 pt-24">
-        <header className="flex flex-col gap-6 text-center lg:text-left">
-          <span className="mx-auto rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium uppercase tracking-[0.3em] text-white/70 lg:mx-0">
-            Sorteio Exclusivo da Minas Café
-          </span>
-          <h1 className="text-4xl font-semibold leading-tight text-white sm:text-5xl lg:text-6xl">
-            É hora de revelar o ganhador do kit exclusivo Minas Café
-          </h1>
-          <p className="mx-auto max-w-3xl text-lg text-zinc-300 lg:mx-0">
-            Todos os participantes foram registrados e validados via WhatsApp.
-            Agora, acompanhe ao vivo o sorteio e veja a escolha final da roleta.
-          </p>
-          <div className="mt-4 flex flex-col items-center gap-4 lg:flex-row lg:items-center">
-            <button
-              type="button"
-              onClick={buttonAction}
-              disabled={isButtonDisabled}
-              className={buttonClassName}
-            >
-              <span className={buttonIconClassName}>{buttonIcon}</span>
-              {buttonLabel}
-            </button>
-            <span className="text-sm text-white/60">
-              {isSpinning
-                ? "A roleta vai revelar o vencedor em instantes."
-                : isResetAvailable
-                ? "Sorteio concluído! Clique para reiniciar a magia e girar novamente."
-                : participants
-                ? "Pronto para girar! Vamos iniciar o sorteio"
-                : "Carregando participantes e resultado..."}
-            </span>
-          </div>
-        </header>
-
-        <section className="mt-10 flex flex-col items-center gap-10">
-          {participants && participants.length <= 0 ? (
-            <div role="status" className="flex items-center h-100">
-              <svg
-                aria-hidden="true"
-                className="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-emerald-500"
-                viewBox="0 0 100 101"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                  fill="currentColor"
-                />
-                <path
-                  d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                  fill="currentFill"
-                />
-              </svg>
-              <span className="ml-2">Carregando participantes...</span>
-            </div>
-          ) : (
-            <div className="w-full max-w-4xl">
-              <div className="relative w-full min-h-[420px]">
-                <div
-                  className={`h-full w-full transition-all duration-700 ease-out ${
-                    isCarouselVisible
-                      ? "opacity-100 translate-y-0"
-                      : "pointer-events-none opacity-0 translate-y-6"
-                  }`}
+        {isDrawPossible ? (
+          <>
+            <header className="flex flex-col gap-6 text-center lg:text-left">
+              <span className="mx-auto rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium uppercase tracking-[0.3em] text-white/70 lg:mx-0">
+                Sorteio Exclusivo da Minas Café
+              </span>
+              <h1 className="text-4xl font-semibold leading-tight text-white sm:text-5xl lg:text-6xl">
+                É hora de revelar o ganhador do kit exclusivo Minas Café
+              </h1>
+              <p className="mx-auto max-w-3xl text-lg text-zinc-300 lg:mx-0">
+                Todos os participantes foram registrados e validados via
+                WhatsApp. Agora, acompanhe ao vivo o sorteio e veja a escolha
+                final da roleta.
+              </p>
+              <div className="mt-4 flex flex-col items-center gap-4 lg:flex-row lg:items-center">
+                <button
+                  type="button"
+                  onClick={buttonAction}
+                  disabled={isButtonDisabled}
+                  className={buttonClassName}
                 >
-                  <Carousel3D
-                    key={carouselKey}
-                    participants={participants}
-                    isSpinning={isSpinning}
-                    winnerParticipant={winnerParticipant}
-                    spinDuration={SPIN_DURATION}
-                  />
-                </div>
-
-                <FloatingParticipants
-                  participants={participants}
-                  isVisible={shouldShowCloud}
-                  isConverging={isCloudConverging}
-                  className="-translate-y-15" // Ajusta a altura
-                />
+                  <span className={buttonIconClassName}>{buttonIcon}</span>
+                  {buttonLabel}
+                </button>
+                <span className="text-sm text-white/60">
+                  {isSpinning
+                    ? "A roleta vai revelar o vencedor em instantes."
+                    : isResetAvailable
+                    ? "Sorteio concluído! Clique para reiniciar a magia e girar novamente."
+                    : participants
+                    ? "Pronto para girar! Vamos iniciar o sorteio"
+                    : "Carregando participantes e resultado..."}
+                </span>
               </div>
-            </div>
-          )}
+            </header>
 
-          <div className="flex w-full max-w-3xl flex-col items-center gap-4 rounded-3xl border border-white/10 bg-white/5 p-8 text-center backdrop-blur">
-            <p className="text-sm font-semibold uppercase tracking-[0.4em] text-emerald-300/80">
-              {hasResult
-                ? "Vencedor Confirmado"
-                : isCarouselVisible
-                ? "Processando"
-                : "Tudo pronto para o sorteio"}
-            </p>
-            <h2 className="text-3xl font-semibold text-white sm:text-4xl">
-              {hasResult
-                ? `${winnerParticipant?.name?.formatFullName} levou o prêmio!`
-                : isCarouselVisible
-                ? "Aguardando o resultado..."
-                : participants.length > 0
-                ? "Todos os participantes carregados"
-                : "Carregando partipantes..."}
-            </h2>
-            <div className="max-w-2xl text-base text-zinc-300">
-              {hasResult ? (
-                winnerParticipant?.prize?.id ? (
-                  <div className="text-center">
-                    <div className="text-2xl font-bold mt-3">
-                      {winnerParticipant?.prize?.title}
-                    </div>
-                    <div className="text-lg">
-                      {winnerParticipant?.prize?.description}
-                    </div>
-                    <div className="mt-6">
-                      "CaFÉ Especial, Momento Especial, Pessoas Especiais"
-                    </div>
-                  </div>
-                ) : (
-                  "Uma história que vale um brinde com o melhor café."
-                )
-              ) : isCarouselVisible ? (
-                "Assim que a roleta parar, anunciaremos o vencedor escolhido."
+            <section className="mt-10 flex flex-col items-center gap-10">
+              {participants && participants.length <= 0 ? (
+                <div role="status" className="flex items-center h-100">
+                  <svg
+                    aria-hidden="true"
+                    className="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-emerald-500"
+                    viewBox="0 0 100 101"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                      fill="currentColor"
+                    />
+                    <path
+                      d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                      fill="currentFill"
+                    />
+                  </svg>
+                  <span className="ml-2">Carregando participantes...</span>
+                </div>
               ) : (
-                "Muito obrigado pela participação em nossa pesquisa e desejamos boa sorte a todos os participantes"
+                <div className="w-full max-w-4xl">
+                  <div className="relative w-full min-h-[420px]">
+                    <div
+                      className={`h-full w-full transition-all duration-700 ease-out ${
+                        isCarouselVisible
+                          ? "opacity-100 translate-y-0"
+                          : "pointer-events-none opacity-0 translate-y-6"
+                      }`}
+                    >
+                      <Carousel3D
+                        key={carouselKey}
+                        participants={participants}
+                        isSpinning={isSpinning}
+                        winnerParticipant={winnerParticipant}
+                        spinDuration={SPIN_DURATION}
+                      />
+                    </div>
+
+                    <FloatingParticipants
+                      participants={participants}
+                      isVisible={shouldShowCloud}
+                      isConverging={isCloudConverging}
+                      className="-translate-y-15" // Ajusta a altura
+                    />
+                  </div>
+                </div>
               )}
-            </div>
-          </div>
-        </section>
+
+              <div className="flex w-full max-w-3xl flex-col items-center gap-4 rounded-3xl border border-white/10 bg-white/5 p-8 text-center backdrop-blur">
+                <p className="text-sm font-semibold uppercase tracking-[0.4em] text-emerald-300/80">
+                  {hasResult
+                    ? "Vencedor Confirmado"
+                    : isCarouselVisible
+                    ? "Processando"
+                    : "Tudo pronto para o sorteio"}
+                </p>
+                <h2 className="text-3xl font-semibold text-white sm:text-4xl">
+                  {hasResult
+                    ? `${winnerParticipant?.name?.formatFullName} levou o prêmio!`
+                    : isCarouselVisible
+                    ? "Aguardando o resultado..."
+                    : participants.length > 0
+                    ? "Todos os participantes carregados"
+                    : "Carregando partipantes..."}
+                </h2>
+                <div className="max-w-2xl text-base text-zinc-300">
+                  {hasResult ? (
+                    winnerParticipant?.prize?.id ? (
+                      <div className="text-center">
+                        <div className="text-2xl font-bold mt-3">
+                          {winnerParticipant?.prize?.title}
+                        </div>
+                        <div className="text-lg">
+                          {winnerParticipant?.prize?.description}
+                        </div>
+                        <div className="mt-6">
+                          "CaFÉ Especial, Momento Especial, Pessoas Especiais"
+                        </div>
+                      </div>
+                    ) : (
+                      "Uma história que vale um brinde com o melhor café."
+                    )
+                  ) : isCarouselVisible ? (
+                    "Assim que a roleta parar, anunciaremos o vencedor escolhido."
+                  ) : (
+                    "Muito obrigado pela participação em nossa pesquisa e desejamos boa sorte a todos os participantes"
+                  )}
+                </div>
+              </div>
+            </section>
+          </>
+        ) : (
+          <>
+            <header className="flex flex-col gap-6 text-center lg:text-left">
+              <span className="mx-auto rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium uppercase tracking-[0.3em] text-white/70 lg:mx-0">
+                Sorteio Encerrado
+              </span>
+
+              <h1 className="text-4xl font-semibold leading-tight text-white sm:text-5xl lg:text-6xl">
+                Obrigado por fazer parte do Sorteio Minas Café ☕✨
+              </h1>
+
+              <p className="mx-auto  text-lg text-zinc-300 lg:mx-0">
+                A roleta já girou, os vencedores foram escolhidos e os nossos
+                kits exclusivos, junto com a cafeteira, encontraram novos donos!
+                Agradecemos imensamente a todos os participantes por fazerem
+                parte desta experiência especial com a Minas Café.
+              </p>
+            </header>
+
+            <section className="mt-10 flex flex-col items-center gap-10">
+              <Image
+                src="/images/minas-cafe-logo-branco-transparente-1080x1080.png"
+                alt="Logo Minas Café"
+                width={450}
+                height={350}
+              />
+              <div className="flex w-full max-w-3xl flex-col items-center gap-4 rounded-3xl border border-white/10 bg-white/5 p-8 text-center backdrop-blur">
+                <p className="text-base text-zinc-300">
+                  Fiquem atentos — em breve teremos novas ações, brindes,
+                  experiências e oportunidades especiais.
+                </p>
+
+                <p className="text-lg font-semibold text-white mt-2">
+                  Minas Café • "Momentos especiais começam com o sabor certo."
+                </p>
+              </div>
+            </section>
+          </>
+        )}
       </main>
       <footer className="relative z-10 flex w-full justify-center pb-10 text-xs text-white/40">
         Criado entre sorteios e goles de café — by SorteZapp.

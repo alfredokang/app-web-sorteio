@@ -35,3 +35,16 @@ export type Participant = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type Prizes = {
+  order: number;
+  drawn: boolean;
+  tile: string;
+  description: string;
+  prizeType: string;
+  winnerId: string;
+  winnerName: string;
+  winnerPhone: string;
+  createdAt: string;
+  updatedAt: string;
+};

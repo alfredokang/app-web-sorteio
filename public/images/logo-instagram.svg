@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="Camada_1" version="1.1" viewBox="103.17 102.37 306.59 306.59">
+  <!-- Generator: Adobe Illustrator 29.8.0, SVG Export Plug-In . SVG Version: 2.1.1 Build 160)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: #fff;
+      }
+
+      .st1 {
+        fill: url(#Degradado_sin_nombre_32);
+      }
+
+      .st2 {
+        fill: url(#Degradado_sin_nombre_3);
+      }
+
+      .st3 {
+        fill: url(#Degradado_sin_nombre_31);
+      }
+    </style>
+    <radialGradient id="Degradado_sin_nombre_3" data-name="Degradado sin nombre 3" cx="154.53" cy="349.75" fx="154.53" fy="349.75" r="318.97" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f9ed41"/>
+      <stop offset=".24" stop-color="#ff833d"/>
+      <stop offset=".4" stop-color="#ee5468"/>
+      <stop offset=".49" stop-color="#e7407b"/>
+      <stop offset="1" stop-color="#0028ff"/>
+    </radialGradient>
+    <radialGradient id="Degradado_sin_nombre_31" data-name="Degradado sin nombre 3" cx="154.53" cy="349.75" fx="154.53" fy="349.75" r="318.97" xlink:href="#Degradado_sin_nombre_3"/>
+    <radialGradient id="Degradado_sin_nombre_32" data-name="Degradado sin nombre 3" cx="154.53" cy="349.75" fx="154.53" fy="349.75" r="318.97" xlink:href="#Degradado_sin_nombre_3"/>
+  </defs>
+  <rect class="st0" x="103.17" y="102.37" width="306.59" height="306.59" rx="39.67" ry="39.67"/>
+  <g>
+    <path class="st2" d="M289.98,342.12h-67.04c-29.19,0-52.94-23.75-52.94-52.94v-67.04c0-29.19,23.75-52.94,52.94-52.94h67.04c29.19,0,52.94,23.75,52.94,52.94v67.04c0,29.19-23.75,52.94-52.94,52.94ZM222.94,182.15c-22.05,0-39.99,17.94-39.99,39.99v67.04c0,22.05,17.94,39.99,39.99,39.99h67.04c22.05,0,40-17.94,40-39.99v-67.04c0-22.05-17.94-39.99-40-39.99h-67.04Z"/>
+    <path class="st3" d="M256.46,299.4c-24.12,0-43.74-19.62-43.74-43.74s19.62-43.74,43.74-43.74,43.74,19.62,43.74,43.74-19.62,43.74-43.74,43.74ZM256.46,225.18c-16.81,0-30.48,13.67-30.48,30.48s13.67,30.48,30.48,30.48,30.48-13.67,30.48-30.48-13.67-30.48-30.48-30.48Z"/>
+    <path class="st1" d="M316.35,207.16c0,6.29-5.1,11.39-11.39,11.39s-11.39-5.1-11.39-11.39,5.1-11.39,11.39-11.39,11.39,5.1,11.39,11.39Z"/>
+  </g>
+</svg>

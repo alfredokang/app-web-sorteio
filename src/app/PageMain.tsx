@@ -41,40 +41,43 @@ export default function PageMain() {
   useEffect(() => {
     async function loadParticipants() {
       try {
-        const colRef = collection(firestore, "participants");
-        const q = query(colRef, where("chosen", "==", false));
+        // 🔥 Executa as duas queries em paralelo
+        const [participantsSnapshot, prizesSnapshot] = await Promise.all([
+          getDocs(
+            query(
+              collection(firestore, "participants"),
+              where("chosen", "==", false)
+            )
+          ),
+          getDocs(
+            query(collection(firestore, "prizes"), where("drawn", "==", false))
+          ),
+        ]);
 
-        const snapshot = await getDocs(q);
-
-        const participantsData = snapshot.docs.map((doc) => ({
+        // 🎯 Mapeia os resultados
+        const participantsData = participantsSnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         })) as Participant[];
 
-        const prizesRef = collection(firestore, "prizes");
-        const q2 = query(prizesRef, where("drawn", "==", false));
-
-        const snapshot2 = await getDocs(q2);
-
-        const prizesData = snapshot2.docs.map((doc) => ({
+        const prizesData = prizesSnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         })) as unknown as Prizes[];
 
-        if (prizesData.length > 0) {
-          setIsDrawPossible(true);
-          setParticipants(participantsData);
-        } else {
-          setIsDrawPossible(false);
-          setParticipants([]);
-        }
+        // ✅ Atualiza estados de uma vez
+        const hasPrizes = prizesData.length > 0;
+        setIsDrawPossible(hasPrizes);
+        setParticipants(hasPrizes ? participantsData : []);
       } catch (error) {
         console.error("Erro ao carregar participantes:", error);
+        // 🛡️ Em caso de erro, reseta os estados
+        setIsDrawPossible(false);
+        setParticipants([]);
       }
     }
 
     setReload(false);
-
     loadParticipants();
   }, [reload]);
 
@@ -433,10 +436,9 @@ export default function PageMain() {
                 </h1>
 
                 <p className="mx-auto  text-lg text-zinc-300 lg:mx-0">
-                  A roleta já girou, os vencedores foram escolhidos e os nossos
-                  kits exclusivos, junto com a cafeteira, encontraram novos
-                  donos! Agradecemos imensamente a todos os participantes por
-                  fazerem parte desta experiência especial com a Minas Café.
+                  O sorteio foi finalizado com sucesso e os vencedores foram
+                  anunciados. Agradecemos imensamente a todos os participantes
+                  por fazerem parte desta experiência especial com a Minas Café.
                 </p>
               </header>
 
@@ -448,14 +450,27 @@ export default function PageMain() {
                   height={350}
                 />
                 <div className="flex w-full max-w-3xl flex-col items-center gap-4 rounded-3xl border border-white/10 bg-white/5 p-8 text-center backdrop-blur">
-                  <p className="text-base text-zinc-300">
+                  <p className="text-lg text-zinc-300">
                     Fiquem atentos — em breve teremos novas ações, brindes,
                     experiências e oportunidades especiais.
                   </p>
 
-                  <p className="text-lg font-semibold text-white mt-2">
+                  <p className="text-xl font-semibold text-white mt-2 italic">
                     Minas Café • "Momentos especiais começam com o sabor certo."
                   </p>
+
+                  <div className="text-lg text-white mt-5 font">
+                    Siga a trilha do café no Instagram
+                    <div className="flex items-center justify-center mt-2">
+                      <Image
+                        src="/images/logo-instagram.png"
+                        alt="Logo Minas Café"
+                        width={30}
+                        height={30}
+                      />
+                      <span className="font-bold ml-1">@minascafeoficial</span>
+                    </div>
+                  </div>
                 </div>
               </section>
             </>

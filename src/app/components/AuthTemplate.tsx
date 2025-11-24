@@ -31,7 +31,7 @@ export function AuthTemplate({
           <div className="flex justify-center mb-10">
             <Image
               src="/images/logo.png"
-              alt="Teste"
+              alt="SortZapp"
               width={330}
               height={330}
             />

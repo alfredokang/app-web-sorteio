@@ -34,6 +34,13 @@ export const metadata: Metadata = {
     siteName: "SorteZapp",
     locale: "pt_BR",
     type: "website",
+    images: [
+      {
+        url: "/images/web-app-manifest-192x192.png", // coloque sua imagem aqui
+        width: 1200,
+        height: 630,
+      },
+    ],
   },
   metadataBase: new URL("https://www.sortezapp.com"),
 };

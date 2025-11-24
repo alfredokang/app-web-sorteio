@@ -456,7 +456,8 @@ export default function PageMain() {
                   </p>
 
                   <p className="text-xl font-semibold text-white mt-2 italic">
-                    Minas Café • "Momentos especiais começam com o sabor certo."
+                    Minas Café • "CaFÉ Especial, Momento Especial,
+                    Pessoas Especiais"
                   </p>
 
                   <div className="text-lg text-white mt-5 font">

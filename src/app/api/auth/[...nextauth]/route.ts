@@ -25,7 +25,7 @@ function isAuthorizedUser(value: unknown): value is AuthorizedUser {
 
 const authSecret = process.env.NEXTAUTH_SECRET ?? "development-secret";
 
-export const authOptions: NextAuthOptions = {
+const authOptions: NextAuthOptions = {
   secret: authSecret,
   session: {
     strategy: "jwt",

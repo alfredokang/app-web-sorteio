@@ -23,7 +23,7 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
   const { status } = useSession();
   const authError = searchParams.get("error");
-  const callbackUrl = searchParams.get("callbackUrl") ?? "/";
+  const callbackUrl = searchParams.get("callbackUrl") ?? "/sorteio";
   const callbackSearch = searchParams.get("callbackSearch") ?? "";
   const derivedAuthErrorMessage = useMemo(() => {
     if (!authError) {

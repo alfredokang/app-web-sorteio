@@ -1,5 +1,6 @@
 "use client";
 
+import { WhatsAppCta } from "@/components/WhatsAppCta";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
@@ -244,12 +245,12 @@ export default function PageMain() {
             >
               Entrar
             </a>
-            <a
-              href="#diagnostico"
+            <WhatsAppCta
+              trackingId="header-desktop"
               className="rounded-full bg-emerald-400 px-5 py-2 text-sm font-semibold text-emerald-950 transition hover:scale-105 hover:bg-emerald-300"
             >
               Fale com a gente
-            </a>
+            </WhatsAppCta>
           </div>
           <button
             type="button"
@@ -288,13 +289,13 @@ export default function PageMain() {
             >
               Entrar
             </a>
-            <a
-              href="#diagnostico"
+            <WhatsAppCta
+              trackingId="header-mobile"
               className="rounded-full bg-emerald-400 px-4 py-3 text-center text-sm font-semibold text-emerald-950 transition hover:scale-105 hover:bg-emerald-300"
               onClick={() => setMenuOpen(false)}
             >
               Fale com a gente
-            </a>
+            </WhatsAppCta>
           </div>
         </div>
       </header>
@@ -343,15 +344,19 @@ export default function PageMain() {
               </li>
             </ul>
             <div className="flex flex-col gap-4 sm:flex-row">
-              <a
-                href="#diagnostico"
+              <WhatsAppCta
+                trackingId="hero-primary"
                 className="inline-flex items-center justify-center rounded-full bg-emerald-400 px-8 py-4 text-base font-semibold text-emerald-950 transition hover:scale-105 hover:bg-emerald-300"
               >
                 Quero meu próximo sorteio
-              </a>
-              <button className="inline-flex items-center justify-center rounded-full border border-white/30 px-8 py-4 text-base font-semibold text-white transition hover:border-white hover:bg-white/10">
+              </WhatsAppCta>
+              <WhatsAppCta
+                trackingId="hero-secondary"
+                variant="outline"
+                className="inline-flex items-center justify-center px-8 py-4 text-base font-semibold"
+              >
                 Solicite uma demonstração
-              </button>
+              </WhatsAppCta>
             </div>
           </div>
 
@@ -457,6 +462,21 @@ export default function PageMain() {
               </div>
             ))}
           </div>
+          <div className="mt-8 flex flex-col gap-3 text-sm text-slate-200 sm:flex-row">
+            <WhatsAppCta
+              trackingId="strategy-primary"
+              className="inline-flex items-center justify-center rounded-full bg-emerald-400 px-6 py-3 font-semibold text-emerald-950 transition hover:scale-105 hover:bg-emerald-300"
+            >
+              Quero aplicar essa estratégia
+            </WhatsAppCta>
+            <WhatsAppCta
+              trackingId="strategy-secondary"
+              variant="outline"
+              className="inline-flex items-center justify-center rounded-full px-6 py-3 font-semibold"
+            >
+              Ver entregáveis de dados
+            </WhatsAppCta>
+          </div>
         </section>
 
         <section
@@ -493,6 +513,21 @@ export default function PageMain() {
                 <div className="mt-auto h-[2px] w-full bg-gradient-to-r from-transparent via-emerald-400/60 to-transparent" />
               </article>
             ))}
+          </div>
+          <div className="mt-10 flex flex-col gap-3 text-sm text-slate-200 sm:flex-row">
+            <WhatsAppCta
+              trackingId="execution-primary"
+              className="inline-flex items-center justify-center rounded-full bg-emerald-400 px-6 py-3 font-semibold text-emerald-950 transition hover:scale-105 hover:bg-emerald-300"
+            >
+              Quero suporte do concierge
+            </WhatsAppCta>
+            <WhatsAppCta
+              trackingId="execution-secondary"
+              variant="outline"
+              className="inline-flex items-center justify-center rounded-full px-6 py-3 font-semibold"
+            >
+              Ver perguntas frequentes
+            </WhatsAppCta>
           </div>
         </section>
 
@@ -535,6 +570,21 @@ export default function PageMain() {
                 </div>
               </article>
             ))}
+          </div>
+          <div className="mt-8 flex flex-col gap-3 text-sm text-slate-200 sm:flex-row">
+            <WhatsAppCta
+              trackingId="intelligence-primary"
+              className="inline-flex items-center justify-center rounded-full bg-emerald-400 px-6 py-3 font-semibold text-emerald-950 transition hover:scale-105 hover:bg-emerald-300"
+            >
+              Receber uma amostra do relatório
+            </WhatsAppCta>
+            <WhatsAppCta
+              trackingId="intelligence-secondary"
+              variant="outline"
+              className="inline-flex items-center justify-center rounded-full px-6 py-3 font-semibold"
+            >
+              Entender o serviço completo
+            </WhatsAppCta>
           </div>
         </section>
 
@@ -585,6 +635,12 @@ export default function PageMain() {
                 </div>
               ))}
             </div>
+            <WhatsAppCta
+              trackingId="concierge-primary"
+              className="mt-8 inline-flex items-center justify-center rounded-full bg-emerald-400 px-8 py-4 text-base font-semibold text-emerald-950 transition hover:scale-105 hover:bg-emerald-300"
+            >
+              Quero um especialista cuidando do meu sorteio
+            </WhatsAppCta>
           </div>
           <div className="rounded-[38px] border border-white/5 bg-slate-950/80 p-10">
             <p className="text-sm uppercase tracking-[0.25em] text-emerald-200">
@@ -617,6 +673,21 @@ export default function PageMain() {
                   <div className="mt-4 h-px w-full bg-gradient-to-r from-white/10 via-emerald-400/40 to-transparent" />
                 </article>
               ))}
+            </div>
+            <div className="mt-8 flex flex-col gap-3 text-sm text-slate-200 sm:flex-row">
+              <WhatsAppCta
+                trackingId="market-primary"
+                className="inline-flex items-center justify-center rounded-full bg-emerald-400 px-6 py-3 font-semibold text-emerald-950 transition hover:scale-105 hover:bg-emerald-300"
+              >
+                Quero virar esse cenário agora
+              </WhatsAppCta>
+              <WhatsAppCta
+                trackingId="market-secondary"
+                variant="outline"
+                className="inline-flex items-center justify-center rounded-full px-6 py-3 font-semibold"
+              >
+                Ver como executamos
+              </WhatsAppCta>
             </div>
           </div>
         </section>
@@ -651,6 +722,21 @@ export default function PageMain() {
                 </li>
               ))}
             </ul>
+            <div className="mt-8 flex flex-col gap-3 text-sm text-slate-200 sm:flex-row">
+              <WhatsAppCta
+                trackingId="prova-primary"
+                className="inline-flex items-center justify-center rounded-full bg-emerald-400 px-6 py-3 font-semibold text-emerald-950 transition hover:scale-105 hover:bg-emerald-300"
+              >
+                Quero gerar essa prova social
+              </WhatsAppCta>
+              <WhatsAppCta
+                trackingId="prova-secondary"
+                variant="outline"
+                className="inline-flex items-center justify-center rounded-full px-6 py-3 font-semibold"
+              >
+                Ver como funciona
+              </WhatsAppCta>
+            </div>
           </div>
           <div className="relative h-full w-full">
             <div className="absolute inset-0 rounded-[32px] bg-gradient-to-br from-emerald-600/50 via-emerald-400/20 to-emerald-300/10 blur-3xl" />
@@ -732,6 +818,14 @@ export default function PageMain() {
               );
             })}
           </div>
+          <div className="text-center">
+            <WhatsAppCta
+              trackingId="faq-primary"
+              className="inline-flex items-center justify-center rounded-full bg-emerald-400 px-8 py-4 text-base font-semibold text-emerald-950 transition hover:scale-105 hover:bg-emerald-300"
+            >
+              Ainda ficou dúvida? Chame nosso time
+            </WhatsAppCta>
+          </div>
         </section>
 
         <section
@@ -787,17 +881,15 @@ export default function PageMain() {
               </p>
             </div>
             <div className="mt-8 space-y-4">
-              <a
-                href="https://wa.me/5500000000000"
-                target="_blank"
-                rel="noreferrer"
+              <WhatsAppCta
+                trackingId="diagnostico-primary"
                 className="inline-flex w-full items-center justify-center gap-3 rounded-full bg-emerald-400 px-8 py-4 text-base font-semibold text-emerald-950 transition hover:scale-[1.02] hover:bg-emerald-300"
               >
                 <span role="img" aria-hidden>
                   💬
                 </span>
                 Falar com um especialista agora
-              </a>
+              </WhatsAppCta>
               <a
                 href="mailto:contato@sortezapp.com"
                 className="inline-flex w-full items-center justify-center gap-3 rounded-full border border-white/30 px-8 py-4 text-base font-semibold text-white transition hover:border-white hover:bg-white/10"

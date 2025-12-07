@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import PageMain from "./PageMain";
 
-const baseTitle = "SorteZapp | Inteligência de Dados Humanizada via WhatsApp";
+const baseTitle = "SorteZapp | Sorteios Rápidos e Automáticos pelo WhatsApp";
 const baseDescription =
   "Sorteios concierge via WhatsApp que captam leads qualificados, entregam dados higienizados e prova social para impulsionar vendas.";
 

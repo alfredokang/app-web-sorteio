@@ -137,7 +137,7 @@ export default function PageMain() {
         <div className="mx-auto flex max-w-6xl justify-between items-center gap-4">
           {/* <div className="text-lg font-semibold text-white">SorteZapp</div> */}
           <Image
-            src="/images/logo.png"
+            src="/images/logo2.png"
             alt="SorteZapp"
             width={200}
             height={200}

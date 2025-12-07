@@ -150,7 +150,7 @@ const faqItems = [
   {
     question: "Posso integrar os leads capturados com meu CRM?",
     answer:
-      "Sim. No plano Avançado disponibilizamos webhooks para enviar automaticamente aos CRMs (RD, HubSpot, Pipedrive etc). Nos demais planos, exportamos CSV/Excel compatíveis.",
+      "Sim. Exportamos CSV/Excel compatíveis para você utilizar nos CRMs (RD, HubSpot, Pipedrive etc) que sejam de sua preferência.",
   },
   {
     question: "E se eu tiver dúvidas durante o processo?",
@@ -712,9 +712,9 @@ export default function PageMain() {
                     }
                   >
                     <div>
-                      <p className="text-xs uppercase tracking-[0.35em] text-emerald-200">
+                      {/* <p className="text-xs uppercase tracking-[0.35em] text-emerald-200">
                         FAQ 0{index + 1}
-                      </p>
+                      </p> */}
                       <h3 className="mt-1 text-lg font-semibold text-white">
                         {item.question}
                       </h3>
@@ -760,7 +760,7 @@ export default function PageMain() {
                   key={bullet}
                   className="flex items-center gap-4 rounded-3xl border border-white/10 bg-white/5 p-4"
                 >
-                  <span className="inline-flex h-[2px] w-8 rounded-full bg-gradient-to-r from-emerald-300 to-emerald-500" />
+                  {/* <span className="inline-flex h-[2px] w-8 rounded-full bg-gradient-to-r from-emerald-300 to-emerald-500" /> */}
                   <p className="text-base font-medium text-white">
                     <span className="mr-2 text-emerald-300">✓</span>
                     {bullet}

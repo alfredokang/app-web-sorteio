@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const comparisonBlocks = [
   {
@@ -83,18 +83,27 @@ const conciergeHighlights = [
 const attentionCrisis = [
   {
     title: "Fadiga de Anúncios",
-    description: "As pessoas ignoram propagandas tradicionais.",
-    icon: "😵",
+    description:
+      "Seu público está saturado. As pessoas ignoram propagandas e seguem rolando o feed.",
+    icon: "⚠️",
   },
   {
-    title: "Custo Crescente",
-    description: "CPL (Custo Por Lead) subindo, qualidade caindo.",
-    icon: "📈",
+    title: "Leads Desqualificados",
+    description:
+      "Você paga caro por cliques, mas recebe contatos que nunca vão comprar. Tempo e dinheiro desperdiçados.",
+    icon: "📉",
   },
   {
-    title: "O Desafio",
-    description: "Como furar essa bolha de saturação?",
-    icon: "❓",
+    title: "CPL em Alta",
+    description:
+      "O custo por lead (CPL) não para de subir enquanto a qualidade dos contatos despenca.",
+    icon: "💸",
+  },
+  {
+    title: "Falta de Engajamento",
+    description:
+      "Seu público não interage com suas campanhas. Como furar essa bolha de atenção?",
+    icon: "🎯",
   },
 ];
 
@@ -117,6 +126,39 @@ const heroStats = [
   { value: "72h", label: "Para lançar seu próximo sorteio" },
 ];
 
+const faqItems = [
+  {
+    question: "Como vocês garantem a segurança dos dados dos participantes?",
+    answer:
+      "Seguimos rigorosamente a LGPD. Todos os dados são criptografados, armazenados no Brasil e trafegam apenas pela API oficial do WhatsApp, garantindo conformidade total.",
+  },
+  {
+    question: "O sorteio é realmente transparente e auditável?",
+    answer:
+      "Sim! Entregamos animação em tempo real para gravar e postar, além de certificado digital com timestamp e hash único para comprovar o ganhador.",
+  },
+  {
+    question: "Preciso ter conhecimento técnico para usar a plataforma?",
+    answer:
+      "Não. Nosso serviço concierge cuida de tudo: estratégia, engenharia de perguntas, configuração técnica e acompanhamento no dia do sorteio.",
+  },
+  {
+    question: "Como funciona a integração com WhatsApp?",
+    answer:
+      "Utilizamos exclusivamente a API Oficial do WhatsApp Business, garantindo segurança, conformidade e alta entregabilidade, sem risco de banimento.",
+  },
+  {
+    question: "Posso integrar os leads capturados com meu CRM?",
+    answer:
+      "Sim. No plano Avançado disponibilizamos webhooks para enviar automaticamente aos CRMs (RD, HubSpot, Pipedrive etc). Nos demais planos, exportamos CSV/Excel compatíveis.",
+  },
+  {
+    question: "E se eu tiver dúvidas durante o processo?",
+    answer:
+      "Você conta com suporte humanizado em todas as etapas. Nossa equipe acompanha do planejamento ao pós-sorteio para garantir uma experiência 360º.",
+  },
+];
+
 const navItems = [
   //   { label: "Início", href: "#hero" },
   { label: "Estratégia", href: "#estrategia" },
@@ -127,9 +169,48 @@ const navItems = [
   { label: "Diagnóstico", href: "#diagnostico" },
 ];
 
+function useReveal<T extends HTMLElement>(threshold = 0.2) {
+  const ref = useRef<T | null>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.unobserve(entry.target);
+        }
+      },
+      { threshold }
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [threshold]);
+
+  return { ref, visible };
+}
+
 export default function PageMain() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
   const currentYear = new Date().getFullYear();
+  const { ref: heroRef, visible: heroVisible } = useReveal<HTMLElement>();
+  const { ref: strategyRef, visible: strategyVisible } =
+    useReveal<HTMLElement>();
+  const { ref: executionRef, visible: executionVisible } =
+    useReveal<HTMLElement>();
+  const { ref: intelligenceRef, visible: intelligenceVisible } =
+    useReveal<HTMLElement>();
+  const { ref: conciergeRef, visible: conciergeVisible } =
+    useReveal<HTMLElement>();
+  const { ref: finaleRef, visible: finaleVisible } = useReveal<HTMLElement>();
+  const { ref: faqRef, visible: faqVisible } = useReveal<HTMLElement>();
+  const { ref: diagnosticRef, visible: diagnosticVisible } =
+    useReveal<HTMLElement>();
 
   return (
     <main className="text-slate-100">
@@ -217,14 +298,19 @@ export default function PageMain() {
           </div>
         </div>
       </header>
-      <div className="relative isolate overflow-hidden px-4 pb-20 pt-10 sm:px-8 lg:px-12">
+      <div className="relative isolate overflow-hidden px-4 pb-20 pt-10 sm:px-6 lg:px-0">
         <div className="absolute inset-0 -z-10 bg-linear-to-b from-emerald-950/80 via-emerald-900/70 to-black" />
         <div className="absolute -left-32 top-28 -z-10 h-64 w-64 rounded-full bg-emerald-500/30 blur-3xl" />
         <div className="absolute right-0 top-96 -z-10 h-72 w-72 rounded-full bg-emerald-400/20 blur-[140px]" />
 
         <section
           id="hero"
-          className="scroll-mt-32 mx-auto grid max-w-6xl gap-12 rounded-[40px] border border-white/5 bg-white/5 p-8 shadow-[0_35px_120px_rgba(0,0,0,0.45)] backdrop-blur-sm lg:grid-cols-[1.05fr,0.95fr] lg:p-12"
+          ref={heroRef}
+          className={`scroll-mt-32 mx-auto grid max-w-6xl gap-12 rounded-[40px] border border-white/5 bg-white/5 p-8 shadow-[0_35px_120px_rgba(0,0,0,0.45)] backdrop-blur-sm transition-all duration-700 lg:grid-cols-[1.05fr,0.95fr] lg:p-12 ${
+            heroVisible
+              ? "translate-y-0 opacity-100"
+              : "translate-y-8 opacity-0"
+          }`}
         >
           <div className="space-y-8">
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-300/30 bg-emerald-300/10 px-4 py-2 text-sm font-medium uppercase tracking-wide text-emerald-100">
@@ -232,7 +318,7 @@ export default function PageMain() {
             </div>
             <div className="space-y-4">
               <h1 className="text-4xl font-semibold leading-tight text-white sm:text-5xl lg:text-6xl">
-                SorteZapp: Inteligência de Dados Humanizada via WhatsApp
+                SorteZapp: Sorteios Rápidos e Automáticos pelo WhatsApp
               </h1>
               <p className="text-lg text-slate-200 sm:text-xl">
                 A solução completa (Do Planejamento ao Sorteio) para captar e
@@ -330,7 +416,12 @@ export default function PageMain() {
 
         <section
           id="estrategia"
-          className="scroll-mt-32 mx-auto mt-16 max-w-6xl space-y-8"
+          ref={strategyRef}
+          className={`scroll-mt-32 mx-auto mt-16 max-w-6xl space-y-8 transition-all duration-700 ${
+            strategyVisible
+              ? "translate-y-0 opacity-100"
+              : "translate-y-8 opacity-0"
+          }`}
         >
           <header className="space-y-3">
             <p className="text-sm uppercase tracking-[0.25em] text-emerald-300">
@@ -346,15 +437,18 @@ export default function PageMain() {
                 key={block.title}
                 className={`rounded-[28px] border border-white/10 bg-gradient-to-br ${block.tone} p-6 shadow-[0_25px_90px_rgba(2,6,23,0.55)]`}
               >
-                <div className="flex items-center gap-3">
-                  <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-black/30 text-2xl">
-                    {block.icon}
-                  </span>
-                  <div>
-                    <p className="text-sm uppercase tracking-wide text-slate-300">
+                <div className="flex items-start gap-4">
+                  <div className="flex flex-col items-center gap-3">
+                    <span className="h-12 w-1 rounded-full bg-gradient-to-b from-emerald-300/70 to-transparent" />
+                    <span className="text-2xl">{block.icon}</span>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs uppercase tracking-[0.35em] text-slate-300">
                       {block.subtitle}
                     </p>
-                    <h3 className="text-xl font-semibold">{block.title}</h3>
+                    <h3 className="mt-1 text-xl font-semibold">
+                      {block.title}
+                    </h3>
                   </div>
                 </div>
                 <p className="mt-4 text-base text-slate-200">
@@ -367,7 +461,12 @@ export default function PageMain() {
 
         <section
           id="execucao"
-          className="scroll-mt-32 mx-auto mt-20 max-w-6xl rounded-[32px] border border-white/5 bg-emerald-950/50 p-10 shadow-[0_35px_120px_rgba(0,0,0,0.45)]"
+          ref={executionRef}
+          className={`scroll-mt-32 mx-auto mt-20 max-w-6xl rounded-[32px] border border-white/5 bg-emerald-950/50 p-10 shadow-[0_35px_120px_rgba(0,0,0,0.45)] transition-all duration-700 ${
+            executionVisible
+              ? "translate-y-0 opacity-100"
+              : "translate-y-8 opacity-0"
+          }`}
         >
           <header className="space-y-3 text-left">
             <p className="text-sm uppercase tracking-[0.25em] text-emerald-200">
@@ -378,20 +477,20 @@ export default function PageMain() {
             </h2>
           </header>
           <div className="mt-10 grid gap-8 md:grid-cols-3">
-            {executionPillars.map((pillar) => (
+            {executionPillars.map((pillar, index) => (
               <article
                 key={pillar.title}
-                className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-white/5 p-6"
+                className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[0_20px_70px_rgba(0,0,0,0.35)]"
               >
-                <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/20 text-2xl">
-                  {pillar.icon}
-                </span>
-                <div>
+                <p className="text-xs uppercase tracking-[0.35em] text-emerald-200">
+                  Pilar 0{index + 1}
+                </p>
+                <div className="flex items-start justify-between gap-4">
                   <h3 className="text-xl font-semibold">{pillar.title}</h3>
-                  <p className="mt-2 text-sm text-slate-300">
-                    {pillar.description}
-                  </p>
+                  <span className="text-2xl">{pillar.icon}</span>
                 </div>
+                <p className="text-sm text-slate-300">{pillar.description}</p>
+                <div className="mt-auto h-[2px] w-full bg-gradient-to-r from-transparent via-emerald-400/60 to-transparent" />
               </article>
             ))}
           </div>
@@ -399,7 +498,12 @@ export default function PageMain() {
 
         <section
           id="inteligencia"
-          className="scroll-mt-32 mx-auto mt-20 max-w-6xl space-y-8"
+          ref={intelligenceRef}
+          className={`scroll-mt-32 mx-auto mt-20 max-w-6xl space-y-8 transition-all duration-700 ${
+            intelligenceVisible
+              ? "translate-y-0 opacity-100"
+              : "translate-y-8 opacity-0"
+          }`}
         >
           <header className="space-y-3">
             <p className="text-sm uppercase tracking-[0.25em] text-emerald-200">
@@ -410,20 +514,25 @@ export default function PageMain() {
             </h2>
           </header>
           <div className="grid gap-6 md:grid-cols-3">
-            {intelligenceDeliverables.map((item) => (
+            {intelligenceDeliverables.map((item, index) => (
               <article
                 key={item.title}
-                className="rounded-[30px] border border-white/10 bg-white/5 p-6"
+                className="rounded-[30px] border border-white/10 bg-white/5 p-6 shadow-[0_20px_70px_rgba(0,0,0,0.3)]"
               >
-                <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/15 text-2xl">
-                  {item.icon}
-                </span>
+                <div className="flex items-center justify-between text-xs uppercase tracking-[0.35em] text-emerald-200">
+                  <span>Entregável 0{index + 1}</span>
+                  <span className="text-base tracking-normal">{item.icon}</span>
+                </div>
                 <h3 className="mt-4 text-xl font-semibold text-white">
                   {item.title}
                 </h3>
                 <p className="mt-2 text-sm text-slate-300">
                   {item.description}
                 </p>
+                <div className="mt-5 inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.4em] text-emerald-200">
+                  <span className="h-px w-8 bg-emerald-400/60" />
+                  Pronto para ativar
+                </div>
               </article>
             ))}
           </div>
@@ -431,9 +540,14 @@ export default function PageMain() {
 
         <section
           id="concierge"
-          className="scroll-mt-32 mx-auto mt-20 max-w-6xl grid gap-8 lg:grid-cols-[1.05fr,0.95fr]"
+          ref={conciergeRef}
+          className={`scroll-mt-32 mx-auto mt-20 max-w-6xl grid gap-8 transition-all duration-700 lg:grid-cols-[1.05fr,0.95fr] ${
+            conciergeVisible
+              ? "translate-y-0 opacity-100"
+              : "translate-y-8 opacity-0"
+          }`}
         >
-          <div className="rounded-[38px] border border-white/5 bg-emerald-950/70 p-10">
+          <div className="rounded-[38px] bg-transparent pb-8">
             <p className="text-sm uppercase tracking-[0.25em] text-emerald-200">
               Concierge
             </p>
@@ -448,16 +562,17 @@ export default function PageMain() {
               {conciergeHighlights.map((highlight) => (
                 <div
                   key={highlight.title}
-                  className="rounded-3xl border border-white/10 bg-white/5 p-6"
+                  className="rounded-[28px] border border-white/10 bg-transparent p-6"
                 >
-                  <div className="flex items-center gap-4">
-                    <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-400/15 text-2xl">
+                  <div className="flex items-center justify-between text-xs uppercase tracking-[0.35em] text-emerald-200">
+                    <span>Concierge ativo</span>
+                    <span className="text-lg tracking-normal">
                       {highlight.icon}
                     </span>
-                    <h3 className="text-xl font-semibold text-white">
-                      {highlight.title}
-                    </h3>
                   </div>
+                  <h3 className="mt-4 text-xl font-semibold text-white">
+                    {highlight.title}
+                  </h3>
                   <p className="mt-3 text-sm text-slate-300">
                     {highlight.description}
                   </p>
@@ -466,35 +581,41 @@ export default function PageMain() {
                       {highlight.extra}
                     </p>
                   )}
+                  <div className="mt-5 h-[2px] w-full bg-gradient-to-r from-transparent via-emerald-400/60 to-transparent" />
                 </div>
               ))}
             </div>
           </div>
-          <div className="rounded-[38px] border border-white/5 bg-emerald-950/70 p-10">
+          <div className="rounded-[38px] border border-white/5 bg-slate-950/80 p-10">
             <p className="text-sm uppercase tracking-[0.25em] text-emerald-200">
               Mercado
             </p>
             <h2 className="mt-3 text-3xl font-semibold text-white">
               O Cenário Atual: A Crise da Atenção
             </h2>
-            <div className="mt-8 space-y-5">
+            <p className="mt-4 text-base text-slate-200">
+              O mercado digital mudou. As estratégias antigas não funcionam
+              mais: feeds saturados, anúncios iguais e um público imune a
+              promessas vazias. É preciso entregar experiências novas para
+              conquistar atenção real.
+            </p>
+            <div className="mt-8 grid gap-5 sm:grid-cols-2">
               {attentionCrisis.map((item) => (
-                <div
+                <article
                   key={item.title}
-                  className="rounded-3xl border border-white/10 bg-white/5 p-6"
+                  className="rounded-[30px] border border-white/10 bg-gradient-to-br from-white/5 via-emerald-500/5 to-transparent p-6 shadow-[0_25px_90px_rgba(0,0,0,0.35)]"
                 >
-                  <div className="flex items-center gap-4">
-                    <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-400/15 text-2xl">
-                      {item.icon}
-                    </span>
-                    <div>
-                      <h3 className="text-xl font-semibold">{item.title}</h3>
-                      <p className="text-sm text-slate-300">
-                        {item.description}
-                      </p>
-                    </div>
+                  <div className="inline-flex items-center justify-center rounded-xl border border-emerald-400/40 bg-emerald-500/10 px-3 py-2 text-base text-emerald-200">
+                    {item.icon}
                   </div>
-                </div>
+                  <h3 className="mt-4 text-xl font-semibold text-white">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-sm text-slate-300">
+                    {item.description}
+                  </p>
+                  <div className="mt-4 h-px w-full bg-gradient-to-r from-white/10 via-emerald-400/40 to-transparent" />
+                </article>
               ))}
             </div>
           </div>
@@ -502,7 +623,12 @@ export default function PageMain() {
 
         <section
           id="prova"
-          className="scroll-mt-32 mx-auto mt-20 max-w-6xl grid items-center gap-10 rounded-[38px] border border-white/5 bg-white/5 p-10 lg:grid-cols-2"
+          ref={finaleRef}
+          className={`scroll-mt-32 mx-auto mt-20 max-w-6xl grid items-center gap-10 rounded-[38px] border border-white/5 bg-white/5 p-10 transition-all duration-700 lg:grid-cols-2 ${
+            finaleVisible
+              ? "translate-y-0 opacity-100"
+              : "translate-y-8 opacity-0"
+          }`}
         >
           <div>
             <p className="text-sm uppercase tracking-[0.25em] text-emerald-200">
@@ -520,9 +646,7 @@ export default function PageMain() {
             <ul className="mt-6 space-y-3 text-base text-slate-200">
               {finaleBullets.map((bullet) => (
                 <li key={bullet} className="flex items-start gap-3">
-                  <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/20 text-lg text-emerald-200">
-                    •
-                  </span>
+                  <span className="mt-3 inline-flex h-[2px] w-8 rounded-full bg-gradient-to-r from-emerald-300 to-emerald-500" />
                   {bullet}
                 </li>
               ))}
@@ -558,8 +682,66 @@ export default function PageMain() {
         </section>
 
         <section
+          id="faq"
+          ref={faqRef}
+          className={`scroll-mt-32 mx-auto mt-20 max-w-4xl space-y-6 transition-all duration-700 ${
+            faqVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+          }`}
+        >
+          <header className="text-center space-y-3">
+            <p className="text-sm uppercase tracking-[0.25em] text-emerald-200">
+              FAQ
+            </p>
+            <h2 className="text-3xl font-semibold text-white">
+              Perguntas que mais recebemos antes do diagnóstico
+            </h2>
+          </header>
+          <div className="space-y-4">
+            {faqItems.map((item, index) => {
+              const isOpen = openFaq === index;
+              return (
+                <div
+                  key={item.question}
+                  className="rounded-3xl border border-white/10 bg-white/5"
+                >
+                  <button
+                    type="button"
+                    className="flex w-full items-center justify-between gap-6 px-6 py-4 text-left"
+                    onClick={() =>
+                      setOpenFaq((prev) => (prev === index ? null : index))
+                    }
+                  >
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.35em] text-emerald-200">
+                        FAQ 0{index + 1}
+                      </p>
+                      <h3 className="mt-1 text-lg font-semibold text-white">
+                        {item.question}
+                      </h3>
+                    </div>
+                    <span className="text-2xl text-emerald-300">
+                      {isOpen ? "-" : "+"}
+                    </span>
+                  </button>
+                  {isOpen && (
+                    <div className="border-t border-white/10 px-6 py-4 text-sm text-slate-200">
+                      {item.answer}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        <section
           id="diagnostico"
-          className="scroll-mt-32 mx-auto mt-24 max-w-6xl grid gap-10 rounded-[42px] border border-white/5 bg-emerald-950/80 p-10 lg:grid-cols-[1.05fr,0.95fr]"
+          ref={diagnosticRef}
+          className={`scroll-mt-32 mx-auto mt-24 max-w-6xl grid gap-10 rounded-[42px] border border-white/5 bg-emerald-950/80 p-10 transition-all duration-700 lg:grid-cols-[1.05fr,0.95fr] ${
+            diagnosticVisible
+              ? "translate-y-0 opacity-100"
+              : "translate-y-8 opacity-0"
+          }`}
         >
           <div>
             <p className="text-sm uppercase tracking-[0.25em] text-emerald-200">
@@ -578,10 +760,11 @@ export default function PageMain() {
                   key={bullet}
                   className="flex items-center gap-4 rounded-3xl border border-white/10 bg-white/5 p-4"
                 >
-                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500/20 text-xl text-emerald-100">
-                    ✓
-                  </span>
-                  <p className="text-base font-medium text-white">{bullet}</p>
+                  <span className="inline-flex h-[2px] w-8 rounded-full bg-gradient-to-r from-emerald-300 to-emerald-500" />
+                  <p className="text-base font-medium text-white">
+                    <span className="mr-2 text-emerald-300">✓</span>
+                    {bullet}
+                  </p>
                 </div>
               ))}
             </div>

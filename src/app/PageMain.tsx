@@ -148,7 +148,7 @@ export default function PageMain() {
                 <li key={item.href}>
                   <a
                     href={item.href}
-                    className="rounded-full px-3 py-1 transition hover:bg-emerald-400/20 hover:text-emerald-100"
+                    className="rounded-full px-3 py-1 transition hover:bg-emerald-400/20 hover:text-emerald-100 font-semibold"
                   >
                     {item.label}
                   </a>
@@ -192,7 +192,7 @@ export default function PageMain() {
               <a
                 key={item.href}
                 href={item.href}
-                className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+                className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 font-semibold"
                 onClick={() => setMenuOpen(false)}
               >
                 {item.label}
@@ -627,7 +627,7 @@ export default function PageMain() {
             </div>
           </div>
         </section>
-        <footer className="mx-auto mt-16 flex max-w-6xl flex-col gap-3 border-t border-white/10 pt-6 text-center text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+        <footer className="font-semibold mx-auto mt-16 flex max-w-6xl flex-col gap-3 border-t border-white/10 pt-6 text-center text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between">
           <p>© {currentYear} SorteZapp. Todos os direitos reservados.</p>
           <p>
             Contato:

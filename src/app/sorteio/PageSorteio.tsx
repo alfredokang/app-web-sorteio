@@ -2,10 +2,10 @@
 
 import { signOut } from "next-auth/react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Carousel3D } from "./components/Carousel3D";
-import { ConfettiOverlay } from "./components/ConfettiOverlay";
-import { FloatingParticipants } from "./components/FloatingParticipants";
-import { Participant, Prizes } from "./components/types";
+import { Carousel3D } from "../components/Carousel3D";
+import { ConfettiOverlay } from "../components/ConfettiOverlay";
+import { FloatingParticipants } from "../components/FloatingParticipants";
+import { Participant, Prizes } from "../components/types";
 import { firestore } from "@/firebase/client";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import Image from "next/image";
@@ -19,7 +19,7 @@ const EXTRA_SPIN_AFTER_WINNER_MS = 10000;
 // Quanto tempo depois de parar a roleta o webhook será enviado (useEffect)
 const WEBHOOK_DELAY = 2000;
 
-export default function PageMain() {
+export default function PageSorteio() {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [winnerParticipant, setWinnerParticipant] =
     useState<Participant | null>(null);

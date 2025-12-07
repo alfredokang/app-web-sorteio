@@ -134,21 +134,7 @@ export default function PageMain() {
   return (
     <main className="text-slate-100">
       <header className="sticky top-0 z-50 border-b border-white/10 bg-[#010a07cc] px-4 py-4 backdrop-blur-xl sm:px-8">
-        <div className="mx-auto flex max-w-6xl items-center gap-4">
-          <button
-            type="button"
-            aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white transition hover:border-white md:hidden"
-            onClick={() => setMenuOpen((prev) => !prev)}
-          >
-            <span
-              className={`inline-flex items-center justify-center text-xl leading-none ${
-                menuOpen ? "" : "-translate-y-[2px]"
-              }`}
-            >
-              {menuOpen ? "✕" : "☰"}
-            </span>
-          </button>
+        <div className="mx-auto flex max-w-6xl justify-between items-center gap-4">
           {/* <div className="text-lg font-semibold text-white">SorteZapp</div> */}
           <Image
             src="/images/logo.png"
@@ -184,7 +170,22 @@ export default function PageMain() {
               Fale com a gente
             </a>
           </div>
+          <button
+            type="button"
+            aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white transition hover:border-white md:hidden"
+            onClick={() => setMenuOpen((prev) => !prev)}
+          >
+            <span
+              className={`inline-flex items-center justify-center text-xl leading-none ${
+                menuOpen ? "" : "-translate-y-[2px]"
+              }`}
+            >
+              {menuOpen ? "✕" : "☰"}
+            </span>
+          </button>
         </div>
+
         <div className={`md:hidden ${menuOpen ? "mt-4 space-y-4" : "hidden"}`}>
           <nav className="flex flex-col gap-2 text-sm text-slate-100">
             {navItems.map((item) => (

@@ -29,12 +29,14 @@ export function AuthTemplate({
             SorteZapp
           </h1> */}
           <div className="flex justify-center mb-10">
-            <Image
-              src="/images/logo.png"
-              alt="SortZapp"
-              width={330}
-              height={330}
-            />
+            <Link href="/">
+              <Image
+                src="/images/logo.png"
+                alt="SortZapp"
+                width={330}
+                height={330}
+              />
+            </Link>
           </div>
           {/* <p className="mb-10 text-md text-blue-200">
             Sorteios Rápidos e Automáticos pelo WhatsApp

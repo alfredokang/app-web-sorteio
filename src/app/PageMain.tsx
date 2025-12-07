@@ -1,0 +1,644 @@
+"use client";
+
+import Image from "next/image";
+import { useState } from "react";
+
+const comparisonBlocks = [
+  {
+    title: "Abordagem Tradicional",
+    subtitle: "Você empurra uma venda.",
+    description: "O cliente se sente interrompido e ignorado.",
+    icon: "📣",
+    tone: "from-black/80 to-slate-900/60",
+  },
+  {
+    title: "Nossa Abordagem",
+    subtitle: "Você oferece um sorteio irresistível.",
+    description:
+      "O cliente cede voluntariamente seus dados em troca da chance de ganhar. Resultado: lead grato e engajado.",
+    icon: "🤝",
+    tone: "from-emerald-600/80 to-emerald-400/50",
+  },
+];
+
+const executionPillars = [
+  {
+    title: "O Dia do Sorteio",
+    description:
+      "Acompanhamento profissional no momento da ação. Garantia técnica de que tudo vai rodar liso.",
+    icon: "🗓️",
+  },
+  {
+    title: "Experiência 360º",
+    description:
+      "Suporte garantido tanto para o empresário quanto para garantir que a experiência do participante no WhatsApp seja fluida e sem falhas.",
+    icon: "🧭",
+  },
+  {
+    title: "Tecnologia + Cuidado Humano",
+    description:
+      "Combinamos o melhor da automação com o toque pessoal que faz a diferença.",
+    icon: "💚",
+  },
+];
+
+const intelligenceDeliverables = [
+  {
+    title: "Relatório de Marketing com Análise Gráfica",
+    description:
+      "Insights detalhados sobre o comportamento do público. Entenda quem respondeu, o que respondeu e por quê.",
+    icon: "📊",
+  },
+  {
+    title: "Planilha de Contatos Higienizada e Organizada",
+    description:
+      "Todos os dados organizados, validados e prontos para ação. Sem duplicatas, sem ruído.",
+    icon: "🗂️",
+  },
+  {
+    title: "Arquivo Compatível com CRM",
+    description:
+      "Integração direta com seu CRM favorito para começar a vender imediatamente.",
+    icon: "🔗",
+  },
+];
+
+const conciergeHighlights = [
+  {
+    title: "Engenharia de Perguntas",
+    description:
+      "Nosso especialista estuda seu nicho e cria o fluxo conversacional perfeito para garimpar as informações que você realmente precisa.",
+    extra:
+      "Benefício: o empresário não perde tempo configurando, nem erra na estratégia.",
+    icon: "⚙️",
+  },
+  {
+    title: "Suporte Dedicado",
+    description:
+      "Você não está sozinho. Temos especialistas prontos para orientar cada passo.",
+    icon: "👨‍💼",
+  },
+];
+
+const attentionCrisis = [
+  {
+    title: "Fadiga de Anúncios",
+    description: "As pessoas ignoram propagandas tradicionais.",
+    icon: "😵",
+  },
+  {
+    title: "Custo Crescente",
+    description: "CPL (Custo Por Lead) subindo, qualidade caindo.",
+    icon: "📈",
+  },
+  {
+    title: "O Desafio",
+    description: "Como furar essa bolha de saturação?",
+    icon: "❓",
+  },
+];
+
+const finaleBullets = [
+  "Conteúdo viral para redes sociais.",
+  "Prova de legitimidade do processo.",
+  "Aumento de autoridade da marca.",
+  "Engajamento orgânico.",
+];
+
+const easyModeBullets = [
+  "Você não configura nada.",
+  "Nós cuidamos de tudo.",
+  "Você vende mais!",
+];
+
+const heroStats = [
+  { value: "4x", label: "Leads mais qualificados" },
+  { value: "98%", label: "Participantes satisfeitos" },
+  { value: "72h", label: "Para lançar seu próximo sorteio" },
+];
+
+const navItems = [
+  //   { label: "Início", href: "#hero" },
+  { label: "Estratégia", href: "#estrategia" },
+  { label: "Execução", href: "#execucao" },
+  { label: "Inteligência", href: "#inteligencia" },
+  { label: "Concierge", href: "#concierge" },
+  //   { label: "Gran Finale", href: "#prova" },
+  { label: "Diagnóstico", href: "#diagnostico" },
+];
+
+export default function PageMain() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const currentYear = new Date().getFullYear();
+
+  return (
+    <main className="text-slate-100">
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-[#010a07cc] px-4 py-4 backdrop-blur-xl sm:px-8">
+        <div className="mx-auto flex max-w-6xl items-center gap-4">
+          <button
+            type="button"
+            aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white transition hover:border-white md:hidden"
+            onClick={() => setMenuOpen((prev) => !prev)}
+          >
+            <span
+              className={`inline-flex items-center justify-center text-xl leading-none ${
+                menuOpen ? "" : "-translate-y-[2px]"
+              }`}
+            >
+              {menuOpen ? "✕" : "☰"}
+            </span>
+          </button>
+          {/* <div className="text-lg font-semibold text-white">SorteZapp</div> */}
+          <Image
+            src="/images/logo.png"
+            alt="SorteZapp"
+            width={200}
+            height={200}
+          />
+          <nav className="hidden flex-1 items-center text-sm text-slate-200 md:flex">
+            <ul className="flex flex-1 items-center gap-2">
+              {navItems.map((item) => (
+                <li key={item.href}>
+                  <a
+                    href={item.href}
+                    className="rounded-full px-3 py-1 transition hover:bg-emerald-400/20 hover:text-emerald-100"
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <div className="ml-auto hidden items-center gap-3 md:flex">
+            <a
+              href="/login"
+              className="rounded-full border border-white/30 px-4 py-2 text-sm font-semibold text-white transition hover:border-white"
+            >
+              Entrar
+            </a>
+            <a
+              href="#diagnostico"
+              className="rounded-full bg-emerald-400 px-5 py-2 text-sm font-semibold text-emerald-950 transition hover:scale-105 hover:bg-emerald-300"
+            >
+              Fale com a gente
+            </a>
+          </div>
+        </div>
+        <div className={`md:hidden ${menuOpen ? "mt-4 space-y-4" : "hidden"}`}>
+          <nav className="flex flex-col gap-2 text-sm text-slate-100">
+            {navItems.map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+                onClick={() => setMenuOpen(false)}
+              >
+                {item.label}
+              </a>
+            ))}
+          </nav>
+          <div className="mt-3 flex flex-col gap-3">
+            <a
+              href="/login"
+              className="rounded-full border border-white/30 px-4 py-3 text-center text-sm font-semibold text-white transition hover:border-white"
+              onClick={() => setMenuOpen(false)}
+            >
+              Entrar
+            </a>
+            <a
+              href="#diagnostico"
+              className="rounded-full bg-emerald-400 px-4 py-3 text-center text-sm font-semibold text-emerald-950 transition hover:scale-105 hover:bg-emerald-300"
+              onClick={() => setMenuOpen(false)}
+            >
+              Fale com a gente
+            </a>
+          </div>
+        </div>
+      </header>
+      <div className="relative isolate overflow-hidden px-4 pb-20 pt-10 sm:px-8 lg:px-12">
+        <div className="absolute inset-0 -z-10 bg-linear-to-b from-emerald-950/80 via-emerald-900/70 to-black" />
+        <div className="absolute -left-32 top-28 -z-10 h-64 w-64 rounded-full bg-emerald-500/30 blur-3xl" />
+        <div className="absolute right-0 top-96 -z-10 h-72 w-72 rounded-full bg-emerald-400/20 blur-[140px]" />
+
+        <section
+          id="hero"
+          className="scroll-mt-32 mx-auto grid max-w-6xl gap-12 rounded-[40px] border border-white/5 bg-white/5 p-8 shadow-[0_35px_120px_rgba(0,0,0,0.45)] backdrop-blur-sm lg:grid-cols-[1.05fr,0.95fr] lg:p-12"
+        >
+          <div className="space-y-8">
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-300/30 bg-emerald-300/10 px-4 py-2 text-sm font-medium uppercase tracking-wide text-emerald-100">
+              SorteZapp • Sorteios por WhatsApp
+            </div>
+            <div className="space-y-4">
+              <h1 className="text-4xl font-semibold leading-tight text-white sm:text-5xl lg:text-6xl">
+                SorteZapp: Inteligência de Dados Humanizada via WhatsApp
+              </h1>
+              <p className="text-lg text-slate-200 sm:text-xl">
+                A solução completa (Do Planejamento ao Sorteio) para captar e
+                qualificar leads em um mercado saturado. Estratégia, operação e
+                prova social entregues em um único serviço concierge.
+              </p>
+            </div>
+            <ul className="space-y-3 text-base text-slate-200">
+              <li className="flex items-start gap-3">
+                <span className="mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-400/30 text-emerald-100">
+                  ●
+                </span>
+                Fluxo de perguntas inteligente e sorteio transparente em tempo
+                real pelo WhatsApp.
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-400/30 text-emerald-100">
+                  ●
+                </span>
+                Dados higienizados e prontos para ativar seu CRM ou próxima
+                campanha de vendas.
+              </li>
+            </ul>
+            <div className="flex flex-col gap-4 sm:flex-row">
+              <a
+                href="#diagnostico"
+                className="inline-flex items-center justify-center rounded-full bg-emerald-400 px-8 py-4 text-base font-semibold text-emerald-950 transition hover:scale-105 hover:bg-emerald-300"
+              >
+                Quero meu próximo sorteio
+              </a>
+              <button className="inline-flex items-center justify-center rounded-full border border-white/30 px-8 py-4 text-base font-semibold text-white transition hover:border-white hover:bg-white/10">
+                Solicite uma demonstração
+              </button>
+            </div>
+          </div>
+
+          <div className="relative">
+            <div className="absolute -top-6 right-4 hidden h-16 w-16 rounded-full bg-emerald-400/40 blur-3xl sm:block" />
+            <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900/80 via-emerald-800/30 to-emerald-600/30 p-6 shadow-[0_30px_100px_rgba(0,0,0,0.55)]">
+              <div className="space-y-6">
+                <div className="flex items-center justify-between rounded-2xl bg-white/5 p-4">
+                  <div>
+                    <p className="text-sm uppercase tracking-wide text-emerald-200">
+                      Próximo sorteio
+                    </p>
+                    <p className="text-lg font-semibold text-white">
+                      LeadStorm Network
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-3xl font-bold text-emerald-300">08</p>
+                    <p className="text-xs uppercase text-slate-400">Dezembro</p>
+                  </div>
+                </div>
+                <div className="rounded-2xl border border-white/5 bg-black/30 p-4">
+                  <p className="text-sm uppercase tracking-wide text-slate-400">
+                    Fluxo Conversacional
+                  </p>
+                  <div className="mt-4 space-y-3">
+                    {["Segmento", "Objetivo", "Oferta", "CTA"].map(
+                      (step, index) => (
+                        <div
+                          key={step}
+                          className="flex items-center justify-between rounded-xl bg-white/5 px-3 py-2"
+                        >
+                          <div className="flex items-center gap-3 text-sm text-slate-200">
+                            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/20 text-sm font-semibold text-emerald-200">
+                              {index + 1}
+                            </span>
+                            {step}
+                          </div>
+                          <span className="text-xs text-emerald-200">OK</span>
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-3 text-center text-sm">
+                  {heroStats.map((stat) => (
+                    <div
+                      key={stat.label}
+                      className="rounded-2xl border border-white/10 bg-white/5 p-3"
+                    >
+                      <p className="text-2xl font-bold text-white">
+                        {stat.value}
+                      </p>
+                      <p className="text-xs text-slate-300">{stat.label}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="estrategia"
+          className="scroll-mt-32 mx-auto mt-16 max-w-6xl space-y-8"
+        >
+          <header className="space-y-3">
+            <p className="text-sm uppercase tracking-[0.25em] text-emerald-300">
+              Estratégia
+            </p>
+            <h2 className="text-3xl font-semibold text-white sm:text-4xl">
+              A Estratégia: O Cavalo de Troia da Reciprocidade
+            </h2>
+          </header>
+          <div className="grid gap-6 md:grid-cols-2">
+            {comparisonBlocks.map((block) => (
+              <div
+                key={block.title}
+                className={`rounded-[28px] border border-white/10 bg-gradient-to-br ${block.tone} p-6 shadow-[0_25px_90px_rgba(2,6,23,0.55)]`}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-black/30 text-2xl">
+                    {block.icon}
+                  </span>
+                  <div>
+                    <p className="text-sm uppercase tracking-wide text-slate-300">
+                      {block.subtitle}
+                    </p>
+                    <h3 className="text-xl font-semibold">{block.title}</h3>
+                  </div>
+                </div>
+                <p className="mt-4 text-base text-slate-200">
+                  {block.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section
+          id="execucao"
+          className="scroll-mt-32 mx-auto mt-20 max-w-6xl rounded-[32px] border border-white/5 bg-emerald-950/50 p-10 shadow-[0_35px_120px_rgba(0,0,0,0.45)]"
+        >
+          <header className="space-y-3 text-left">
+            <p className="text-sm uppercase tracking-[0.25em] text-emerald-200">
+              Operação
+            </p>
+            <h2 className="text-3xl font-semibold">
+              Execução Impecável e Suporte Humanizado
+            </h2>
+          </header>
+          <div className="mt-10 grid gap-8 md:grid-cols-3">
+            {executionPillars.map((pillar) => (
+              <article
+                key={pillar.title}
+                className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-white/5 p-6"
+              >
+                <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/20 text-2xl">
+                  {pillar.icon}
+                </span>
+                <div>
+                  <h3 className="text-xl font-semibold">{pillar.title}</h3>
+                  <p className="mt-2 text-sm text-slate-300">
+                    {pillar.description}
+                  </p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section
+          id="inteligencia"
+          className="scroll-mt-32 mx-auto mt-20 max-w-6xl space-y-8"
+        >
+          <header className="space-y-3">
+            <p className="text-sm uppercase tracking-[0.25em] text-emerald-200">
+              Inteligência
+            </p>
+            <h2 className="text-3xl font-semibold text-white">
+              Inteligência de Negócios: O Que Você Recebe
+            </h2>
+          </header>
+          <div className="grid gap-6 md:grid-cols-3">
+            {intelligenceDeliverables.map((item) => (
+              <article
+                key={item.title}
+                className="rounded-[30px] border border-white/10 bg-white/5 p-6"
+              >
+                <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/15 text-2xl">
+                  {item.icon}
+                </span>
+                <h3 className="mt-4 text-xl font-semibold text-white">
+                  {item.title}
+                </h3>
+                <p className="mt-2 text-sm text-slate-300">
+                  {item.description}
+                </p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section
+          id="concierge"
+          className="scroll-mt-32 mx-auto mt-20 max-w-6xl grid gap-8 lg:grid-cols-[1.05fr,0.95fr]"
+        >
+          <div className="rounded-[38px] border border-white/5 bg-emerald-950/70 p-10">
+            <p className="text-sm uppercase tracking-[0.25em] text-emerald-200">
+              Concierge
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold text-white">
+              Mais que uma Ferramenta: Um Serviço Concierge
+            </h2>
+            <p className="mt-4 text-base text-slate-200">
+              Não entregamos uma ferramenta para você se virar sozinho. Nós
+              fazemos por você.
+            </p>
+            <div className="mt-8 space-y-6">
+              {conciergeHighlights.map((highlight) => (
+                <div
+                  key={highlight.title}
+                  className="rounded-3xl border border-white/10 bg-white/5 p-6"
+                >
+                  <div className="flex items-center gap-4">
+                    <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-400/15 text-2xl">
+                      {highlight.icon}
+                    </span>
+                    <h3 className="text-xl font-semibold text-white">
+                      {highlight.title}
+                    </h3>
+                  </div>
+                  <p className="mt-3 text-sm text-slate-300">
+                    {highlight.description}
+                  </p>
+                  {highlight.extra && (
+                    <p className="mt-2 text-sm font-medium text-emerald-200">
+                      {highlight.extra}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-[38px] border border-white/5 bg-emerald-950/70 p-10">
+            <p className="text-sm uppercase tracking-[0.25em] text-emerald-200">
+              Mercado
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold text-white">
+              O Cenário Atual: A Crise da Atenção
+            </h2>
+            <div className="mt-8 space-y-5">
+              {attentionCrisis.map((item) => (
+                <div
+                  key={item.title}
+                  className="rounded-3xl border border-white/10 bg-white/5 p-6"
+                >
+                  <div className="flex items-center gap-4">
+                    <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-400/15 text-2xl">
+                      {item.icon}
+                    </span>
+                    <div>
+                      <h3 className="text-xl font-semibold">{item.title}</h3>
+                      <p className="text-sm text-slate-300">
+                        {item.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="prova"
+          className="scroll-mt-32 mx-auto mt-20 max-w-6xl grid items-center gap-10 rounded-[38px] border border-white/5 bg-white/5 p-10 lg:grid-cols-2"
+        >
+          <div>
+            <p className="text-sm uppercase tracking-[0.25em] text-emerald-200">
+              Prova Social
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold text-white">
+              O Gran Finale: Prova Social e Transparência
+            </h2>
+            <p className="mt-4 text-base text-slate-200">
+              A ferramenta gera uma animação bonita do sorteio que serve como
+              conteúdo para redes sociais. Isso gera autoridade e prova a
+              idoneidade do processo. Seus clientes veem que o sorteio é
+              legítimo e transparente.
+            </p>
+            <ul className="mt-6 space-y-3 text-base text-slate-200">
+              {finaleBullets.map((bullet) => (
+                <li key={bullet} className="flex items-start gap-3">
+                  <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/20 text-lg text-emerald-200">
+                    •
+                  </span>
+                  {bullet}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="relative h-full w-full">
+            <div className="absolute inset-0 rounded-[32px] bg-gradient-to-br from-emerald-600/50 via-emerald-400/20 to-emerald-300/10 blur-3xl" />
+            <div className="relative rounded-[32px] border border-white/10 bg-gradient-to-br from-slate-950/90 via-emerald-900/50 to-emerald-700/30 p-8 shadow-[0_45px_140px_rgba(0,0,0,0.55)]">
+              <div className="space-y-4">
+                {heroStats.map((stat) => (
+                  <div
+                    key={`finale-${stat.label}`}
+                    className="rounded-2xl border border-white/5 bg-white/5 p-4"
+                  >
+                    <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
+                      Indicador
+                    </p>
+                    <div className="mt-3 flex items-center justify-between">
+                      <p className="text-2xl font-bold text-white">
+                        {stat.value}
+                      </p>
+                      <p className="text-sm text-slate-300">{stat.label}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-6 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm text-emerald-100">
+                Conteúdo pronto para viralizar, com gráficos, números e todos os
+                elementos visuais que reforçam a confiança do sorteio.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="diagnostico"
+          className="scroll-mt-32 mx-auto mt-24 max-w-6xl grid gap-10 rounded-[42px] border border-white/5 bg-emerald-950/80 p-10 lg:grid-cols-[1.05fr,0.95fr]"
+        >
+          <div>
+            <p className="text-sm uppercase tracking-[0.25em] text-emerald-200">
+              Sem complicação
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold text-white">
+              Deixe a Parte Chata com a Gente
+            </h2>
+            <p className="mt-4 text-base text-slate-200">
+              Deixe a parte chata e técnica com a SorteZapp e foque apenas em
+              vender para os leads qualificados que vamos te entregar.
+            </p>
+            <div className="mt-8 space-y-4">
+              {easyModeBullets.map((bullet) => (
+                <div
+                  key={bullet}
+                  className="flex items-center gap-4 rounded-3xl border border-white/10 bg-white/5 p-4"
+                >
+                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500/20 text-xl text-emerald-100">
+                    ✓
+                  </span>
+                  <p className="text-base font-medium text-white">{bullet}</p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-8 text-sm text-slate-300">
+              Vamos entender seus desafios e mostrar como o SorteZapp pode
+              transformar sua captação de leads.
+            </p>
+          </div>
+          <div className="flex flex-col justify-between rounded-[32px] border border-white/10 bg-white/5 p-8">
+            <div>
+              <p className="text-sm uppercase tracking-[0.25em] text-emerald-200">
+                Próximo passo
+              </p>
+              <h3 className="mt-3 text-2xl font-semibold text-white">
+                Agende uma Reunião de Diagnóstico para Seu Próximo Sorteio
+              </h3>
+              <p className="mt-3 text-sm text-slate-300">
+                Escolha seu melhor horário, receba um plano de ação e saia da
+                call com o cronograma pronto para lançar.
+              </p>
+            </div>
+            <div className="mt-8 space-y-4">
+              <a
+                href="https://wa.me/5500000000000"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex w-full items-center justify-center gap-3 rounded-full bg-emerald-400 px-8 py-4 text-base font-semibold text-emerald-950 transition hover:scale-[1.02] hover:bg-emerald-300"
+              >
+                <span role="img" aria-hidden>
+                  💬
+                </span>
+                Falar com um especialista agora
+              </a>
+              <a
+                href="mailto:contato@sortezapp.com"
+                className="inline-flex w-full items-center justify-center gap-3 rounded-full border border-white/30 px-8 py-4 text-base font-semibold text-white transition hover:border-white hover:bg-white/10"
+              >
+                <span role="img" aria-hidden>
+                  ✉️
+                </span>
+                Quero receber o plano por e-mail
+              </a>
+            </div>
+          </div>
+        </section>
+        <footer className="mx-auto mt-16 flex max-w-6xl flex-col gap-3 border-t border-white/10 pt-6 text-center text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+          <p>© {currentYear} SorteZapp. Todos os direitos reservados.</p>
+          <p>
+            Contato:
+            <a
+              href="mailto:contato@sortezapp.com"
+              className="ml-1 text-emerald-200 underline-offset-4 hover:underline"
+            >
+              contato@sortezapp.com
+            </a>
+          </p>
+        </footer>
+      </div>
+    </main>
+  );
+}

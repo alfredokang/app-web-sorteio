@@ -739,7 +739,7 @@ export default function PageMain() {
               Mercado
             </p>
             <h2 className="mt-3 text-3xl font-semibold text-white">
-              ❌ Você esta gastando muito para ser ignorado
+              ❌ Você está gastando muito para ser ignorado
             </h2>
             <p className="mt-4 text-base text-slate-200">
               É preciso entregar experiências novas para conquistar atenção

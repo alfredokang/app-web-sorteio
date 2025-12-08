@@ -322,9 +322,9 @@ export default function PageMain() {
                 SorteZapp: Sorteios Rápidos e Automáticos pelo WhatsApp
               </h1>
               <p className="text-lg text-slate-200 sm:text-xl">
-                A solução completa (Do Planejamento ao Sorteio) para captar e
-                qualificar leads em um mercado saturado. Estratégia, operação e
-                prova social entregues em um único serviço concierge.
+                A solução completa para criar, conduzir e validar sorteios pelo
+                WhatsApp — com automação, inteligência de dados e transparência
+                total.
               </p>
             </div>
             <ul className="space-y-3 text-base text-slate-200">
@@ -364,7 +364,7 @@ export default function PageMain() {
             <div className="absolute -top-6 right-4 hidden h-16 w-16 rounded-full bg-emerald-400/40 blur-3xl sm:block" />
             <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900/80 via-emerald-800/30 to-emerald-600/30 p-6 shadow-[0_30px_100px_rgba(0,0,0,0.55)]">
               <div className="space-y-6">
-                <div className="flex items-center justify-between rounded-2xl bg-white/5 p-4">
+                {/* <div className="flex items-center justify-between rounded-2xl bg-white/5 p-4">
                   <div>
                     <p className="text-sm uppercase tracking-wide text-emerald-200">
                       Próximo sorteio
@@ -377,28 +377,31 @@ export default function PageMain() {
                     <p className="text-3xl font-bold text-emerald-300">08</p>
                     <p className="text-xs uppercase text-slate-400">Dezembro</p>
                   </div>
-                </div>
+                </div> */}
                 <div className="rounded-2xl border border-white/5 bg-black/30 p-4">
                   <p className="text-sm uppercase tracking-wide text-slate-400">
                     Fluxo Conversacional
                   </p>
                   <div className="mt-4 space-y-3">
-                    {["Segmento", "Objetivo", "Oferta", "CTA"].map(
-                      (step, index) => (
-                        <div
-                          key={step}
-                          className="flex items-center justify-between rounded-xl bg-white/5 px-3 py-2"
-                        >
-                          <div className="flex items-center gap-3 text-sm text-slate-200">
-                            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/20 text-sm font-semibold text-emerald-200">
-                              {index + 1}
-                            </span>
-                            {step}
-                          </div>
-                          <span className="text-xs text-emerald-200">OK</span>
+                    {[
+                      "Fluxo de perguntas inteligente e personalizado, validando os dados dos participantes em tempo real.",
+                      "Sorteio transparente, automatizado e auditável, realizado diretamente pelo WhatsApp.",
+                      "Relatório completo + análise por IA, com insights acionáveis para decisões rápidas.",
+                      "CSV com todos os leads higienizados, pronto para importar no seu CRM, automação ou time comercial.",
+                    ].map((step, index) => (
+                      <div
+                        key={step}
+                        className="flex items-center justify-between rounded-xl bg-white/5 px-3 py-2"
+                      >
+                        <div className="flex items-center gap-3 text-sm text-slate-200">
+                          <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/20 text-sm font-semibold text-emerald-200">
+                            {index + 1}
+                          </span>
+                          {step}
                         </div>
-                      )
-                    )}
+                        <span className="text-xs text-emerald-200">OK</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-3 text-center text-sm">

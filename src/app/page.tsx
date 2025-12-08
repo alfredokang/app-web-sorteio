@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import PageMain from "./PageMain";
 
-const baseTitle = "SorteZapp | Sorteios Rápidos e Automáticos pelo WhatsApp";
+const baseTitle =
+  "SorteZapp | Automação de Sorteios e Captação de Leads no WhatsApp";
 const baseDescription =
-  "Sorteios concierge via WhatsApp que captam leads qualificados, entregam dados higienizados e prova social para impulsionar vendas.";
+  "Cansado de leads ruins? Use o SorteZapp para gerar leads qualificados através de sorteios virais no WhatsApp.";
 
 export const metadata: Metadata = {
   title: baseTitle,
@@ -11,12 +12,17 @@ export const metadata: Metadata = {
   keywords: [
     "SorteZapp",
     "sorteio no WhatsApp",
-    "captar leads",
+    "ferramenta de sorteio",
+    "captar leads qualificados",
+    "gerar leads WhatsApp",
     "inteligência de dados",
     "automação humanizada",
-    "marketing com sorteio",
+    "marketing de reciprocidade",
     "concierge de sorteios",
-    "qualificação de leads",
+    "marketing com sorteio",
+    "baixar CPL",
+    "sistema de sorteio online",
+    "estratégia de gamificação",
   ],
   alternates: { canonical: "/" },
   category: "technology",

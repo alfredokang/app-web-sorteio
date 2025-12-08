@@ -45,7 +45,7 @@ export default function PageSorteio() {
         const [participantsSnapshot, prizesSnapshot] = await Promise.all([
           getDocs(
             query(
-              collection(firestore, "participants"),
+              collection(firestore, "participants_teste"),
               where("chosen", "==", false)
             )
           ),

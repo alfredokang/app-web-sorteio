@@ -1,0 +1,25 @@
+<svg width="912" height="512" viewBox="0 0 912 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#05211a"/>
+      <stop offset="100%" stop-color="#03120d"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#11b98f"/>
+      <stop offset="100%" stop-color="#87ffd3"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" rx="32" fill="url(#bg)"/>
+  <rect x="64" y="64" width="784" height="384" rx="32" fill="#062b23" stroke="#14d397" stroke-width="2" opacity="0.9"/>
+  <rect x="96" y="120" width="240" height="112" rx="16" fill="#0c3a2d" stroke="#20f0b9" opacity="0.8"/>
+  <rect x="368" y="120" width="240" height="112" rx="16" fill="#0c3a2d" stroke="#20f0b9" opacity="0.8"/>
+  <rect x="640" y="120" width="176" height="264" rx="16" fill="#0c3a2d" stroke="#20f0b9" opacity="0.8"/>
+  <rect x="96" y="256" width="512" height="128" rx="16" fill="#0c3a2d" stroke="#20f0b9" opacity="0.8"/>
+  <rect x="112" y="280" width="480" height="16" rx="8" fill="url(#card)"/>
+  <rect x="112" y="312" width="320" height="16" rx="8" fill="#0c5a44"/>
+  <rect x="112" y="344" width="380" height="16" rx="8" fill="#0c5a44"/>
+  <circle cx="168" cy="176" r="40" fill="#083427"/>
+  <path d="M152 176l12 12 20-20" fill="none" stroke="#7cffe0" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="96" y="440" fill="#7cffe0" font-family="Inter, Arial, sans-serif" font-size="18" letter-spacing="0.4em">MOCK SORTEIO</text>
+  <text x="96" y="472" fill="#d7fff1" font-family="Inter, Arial, sans-serif" font-size="16" opacity="0.8">Substitua este mock por sua imagem do sorteio final.</text>
+</svg>

@@ -1,0 +1,38 @@
+<svg width="1353" height="768" viewBox="0 0 1353 768" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#032922"/>
+      <stop offset="100%" stop-color="#03130c"/>
+    </linearGradient>
+    <radialGradient id="glow3" cx="50%" cy="40%" r="60%">
+      <stop offset="0" stop-color="#28fcb8" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#010705" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#bg3)"/>
+  <rect width="100%" height="100%" fill="url(#glow3)"/>
+  <g opacity="0.3">
+    <circle cx="250" cy="120" r="8" fill="#ffda79"/>
+    <circle cx="340" cy="200" r="6" fill="#ff8e72"/>
+    <circle cx="500" cy="140" r="6" fill="#72d9ff"/>
+    <circle cx="1040" cy="200" r="8" fill="#ffd972"/>
+    <circle cx="960" cy="120" r="6" fill="#fe8f71"/>
+    <circle cx="760" cy="80" r="6" fill="#77f3c0"/>
+    <circle cx="1160" cy="160" r="5" fill="#9db7ff"/>
+    <circle cx="200" cy="200" r="5" fill="#9df9d0"/>
+    <circle cx="1120" cy="110" r="4" fill="#ffd3f6"/>
+  </g>
+  <g fill="#0c332a">
+    <rect x="380" y="270" width="240" height="150" rx="30"/>
+    <rect x="670" y="270" width="240" height="150" rx="30"/>
+    <rect x="560" y="360" width="240" height="150" rx="30"/>
+  </g>
+  <g fill="#27c59a">
+    <rect x="610" y="300" width="240" height="150" rx="30"/>
+  </g>
+  <g fill="#62f5ca" font-family="Inter, Arial, sans-serif" text-anchor="middle">
+    <text x="676" y="560" font-size="18" fill="#6bdba5" letter-spacing="0.4em">VENCEDOR CONFIRMADO</text>
+    <text x="676" y="610" font-size="38" font-weight="600" fill="#e7fff5">Patrícia Santos Pereira levou o prêmio!</text>
+    <text x="676" y="650" font-size="22" fill="#9bb0a4">Box de Café - 3 Meses garantido.</text>
+  </g>
+</svg>

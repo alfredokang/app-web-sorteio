@@ -6,17 +6,18 @@ import { useEffect, useRef, useState } from "react";
 
 const comparisonBlocks = [
   {
-    title: "Abordagem Tradicional",
-    subtitle: "Você empurra uma venda.",
-    description: "O cliente se sente interrompido e ignorado.",
+    title: "Marketing de Interrupção",
+    subtitle: "O VELHO JEITO",
+    description:
+      "Você tenta vender para quem não pediu. O cliente se sente incomodado, ignora o seu anúncio e sua marca perde prestígio.",
     icon: "📣",
     tone: "from-black/80 to-slate-900/60",
   },
   {
-    title: "Nossa Abordagem",
-    subtitle: "Você oferece um sorteio irresistível.",
+    title: "Marketing de Reciprocidade",
+    subtitle: "O JEITO SORTEZAPP",
     description:
-      "O cliente cede voluntariamente seus dados em troca da chance de ganhar. Resultado: lead grato e engajado.",
+      "Você oferece um prêmio desejado. O cliente entra os dados feliz em troca da chance de ganhar. Resultado: Um lead grato e aberto a ouvir você.",
     icon: "🤝",
     tone: "from-emerald-600/80 to-emerald-400/50",
   },
@@ -124,7 +125,34 @@ const easyModeBullets = [
 const heroStats = [
   { value: "4x", label: "Leads mais qualificados" },
   { value: "98%", label: "Participantes satisfeitos" },
-  { value: "72h", label: "Para lançar seu próximo sorteio" },
+  { value: "63%", label: "Aceitação de notificações pós sorteio" },
+];
+
+const heroCarouselSlides = [
+  {
+    image: "/images/foto-sorteio-um.png",
+    alt: "Tela do sorteio com todos os participantes carregados",
+    badge: "Preparação",
+    title: "Todos os participantes carregados",
+    description:
+      "Momento inicial em que o SorteZapp valida cada lead e deixa tudo pronto para girar.",
+  },
+  {
+    image: "/images/sorteio-sendo-realizado.png",
+    alt: "Visual do sorteio em processamento aguardando resultado",
+    badge: "Processando",
+    title: "Aguardando o resultado",
+    description:
+      "A roleta entra em ação, garantindo transparência e auditabilidade em tempo real.",
+  },
+  {
+    image: "/images/sorteio-ganhador.png",
+    alt: "Confirmação do vencedor com destaque para o prêmio",
+    badge: "Vencedor confirmado",
+    title: "Resultado entregue",
+    description:
+      "Comunicação instantânea do ganhador com relatório auditável para compartilhar com o público.",
+  },
 ];
 
 const faqItems = [
@@ -198,6 +226,7 @@ function useReveal<T extends HTMLElement>(threshold = 0.2) {
 export default function PageMain() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [heroCarouselIndex, setHeroCarouselIndex] = useState(0);
   const currentYear = new Date().getFullYear();
   const { ref: heroRef, visible: heroVisible } = useReveal<HTMLElement>();
   const { ref: strategyRef, visible: strategyVisible } =
@@ -212,6 +241,16 @@ export default function PageMain() {
   const { ref: faqRef, visible: faqVisible } = useReveal<HTMLElement>();
   const { ref: diagnosticRef, visible: diagnosticVisible } =
     useReveal<HTMLElement>();
+  const heroSlidesCount = heroCarouselSlides.length;
+  const activeHeroSlide = heroCarouselSlides[heroCarouselIndex];
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setHeroCarouselIndex((prevIndex) => (prevIndex + 1) % heroSlidesCount);
+    }, 4000); // tempo maior entre cada slide para leitura confortável
+
+    return () => window.clearInterval(timer);
+  }, [heroSlidesCount]);
 
   return (
     <main className="text-slate-100">
@@ -378,7 +417,7 @@ export default function PageMain() {
                     <p className="text-xs uppercase text-slate-400">Dezembro</p>
                   </div>
                 </div> */}
-                <div className="rounded-2xl border border-white/5 bg-black/30 p-4">
+                {/* <div className="rounded-2xl border border-white/5 bg-black/30 p-4">
                   <p className="text-sm uppercase tracking-wide text-slate-400">
                     Fluxo Conversacional
                   </p>
@@ -403,8 +442,8 @@ export default function PageMain() {
                       </div>
                     ))}
                   </div>
-                </div>
-                <div className="grid grid-cols-3 gap-3 text-center text-sm">
+                </div> */}
+                <div className="grid grid-cols-1 gap-3 text-left text-sm sm:grid-cols-3 sm:text-center">
                   {heroStats.map((stat) => (
                     <div
                       key={stat.label}
@@ -416,6 +455,57 @@ export default function PageMain() {
                       <p className="text-xs text-slate-300">{stat.label}</p>
                     </div>
                   ))}
+                </div>
+                <div className="space-y-4 rounded-2xl border border-white/5 bg-black/20 p-4">
+                  <p className="text-sm uppercase tracking-wide text-slate-400">
+                    Experiência visual SorteZapp
+                  </p>
+                  <div
+                    className="relative w-full overflow-hidden rounded-xl border border-white/10 bg-[#010a07]"
+                    style={{ aspectRatio: "16 / 9" }}
+                  >
+                    {heroCarouselSlides.map((slide, index) => (
+                      <div
+                        key={slide.image}
+                        className={`absolute inset-0 transition-opacity duration-700 ${
+                          index === heroCarouselIndex
+                            ? "opacity-100"
+                            : "opacity-0"
+                        }`}
+                      >
+                        <Image
+                          src={slide.image}
+                          alt={slide.alt}
+                          fill
+                          sizes="(min-width: 1024px) 520px, 100vw"
+                          className="object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="text-center">
+                    <p className="text-xs uppercase tracking-[0.35em] text-emerald-200">
+                      {activeHeroSlide.badge}
+                    </p>
+                    <p className="mt-1 text-base font-semibold text-white">
+                      {activeHeroSlide.title}
+                    </p>
+                    <p className="mt-1 text-sm text-slate-300">
+                      {activeHeroSlide.description}
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-center gap-2">
+                    {heroCarouselSlides.map((_, index) => (
+                      <span
+                        key={`hero-indicator-${index}`}
+                        className={`h-1.5 w-6 rounded-full transition ${
+                          index === heroCarouselIndex
+                            ? "bg-emerald-400"
+                            : "bg-white/20"
+                        }`}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -436,7 +526,7 @@ export default function PageMain() {
               Estratégia
             </p>
             <h2 className="text-3xl font-semibold text-white sm:text-4xl">
-              A Estratégia: O Cavalo de Troia da Reciprocidade
+              O Poder da Reciprocidade
             </h2>
           </header>
           <div className="grid gap-6 md:grid-cols-2">
@@ -472,13 +562,13 @@ export default function PageMain() {
             >
               Quero aplicar essa estratégia
             </WhatsAppCta>
-            <WhatsAppCta
+            {/* <WhatsAppCta
               trackingId="strategy-secondary"
               variant="outline"
               className="inline-flex items-center justify-center rounded-full px-6 py-3 font-semibold"
             >
               Ver entregáveis de dados
-            </WhatsAppCta>
+            </WhatsAppCta> */}
           </div>
         </section>
 
@@ -524,13 +614,12 @@ export default function PageMain() {
             >
               Quero suporte do concierge
             </WhatsAppCta>
-            <WhatsAppCta
-              trackingId="execution-secondary"
-              variant="outline"
-              className="inline-flex items-center justify-center rounded-full px-6 py-3 font-semibold"
+            <a
+              href="#faq"
+              className="inline-flex items-center justify-center rounded-full border border-white/30 px-6 py-3 font-semibold text-white transition hover:border-emerald-300 hover:text-emerald-100"
             >
               Ver perguntas frequentes
-            </WhatsAppCta>
+            </a>
           </div>
         </section>
 
@@ -650,13 +739,13 @@ export default function PageMain() {
               Mercado
             </p>
             <h2 className="mt-3 text-3xl font-semibold text-white">
-              O Cenário Atual: A Crise da Atenção
+              ❌ Você esta gastando muito para ser ignorado
             </h2>
             <p className="mt-4 text-base text-slate-200">
-              O mercado digital mudou. As estratégias antigas não funcionam
-              mais: feeds saturados, anúncios iguais e um público imune a
-              promessas vazias. É preciso entregar experiências novas para
-              conquistar atenção real.
+              É preciso entregar experiências novas para conquistar atenção
+              real. As estratégias antigas não funcionam mais: feeds saturados,
+              anúncios iguais e um público imune a promessas vazias. Pare de
+              interromper o seu cliente e comece a atraí-lo de verdade.
             </p>
             <div className="mt-8 grid gap-5 sm:grid-cols-2">
               {attentionCrisis.map((item) => (
@@ -682,15 +771,15 @@ export default function PageMain() {
                 trackingId="market-primary"
                 className="inline-flex items-center justify-center rounded-full bg-emerald-400 px-6 py-3 font-semibold text-emerald-950 transition hover:scale-105 hover:bg-emerald-300"
               >
-                Quero virar esse cenário agora
+                Quero resolver isto agora
               </WhatsAppCta>
-              <WhatsAppCta
+              {/* <WhatsAppCta
                 trackingId="market-secondary"
                 variant="outline"
                 className="inline-flex items-center justify-center rounded-full px-6 py-3 font-semibold"
               >
-                Ver como executamos
-              </WhatsAppCta>
+                Quero resolver isto agora
+              </WhatsAppCta> */}
             </div>
           </div>
         </section>
@@ -743,8 +832,8 @@ export default function PageMain() {
           </div>
           <div className="relative h-full w-full">
             <div className="absolute inset-0 rounded-[32px] bg-gradient-to-br from-emerald-600/50 via-emerald-400/20 to-emerald-300/10 blur-3xl" />
-            <div className="relative rounded-[32px] border border-white/10 bg-gradient-to-br from-slate-950/90 via-emerald-900/50 to-emerald-700/30 p-8 shadow-[0_45px_140px_rgba(0,0,0,0.55)]">
-              <div className="space-y-4">
+            <div className="relative rounded-[32px] border border-white/10 bg-gradient-to-br from-slate-950/90 via-emerald-900/50 to-emerald-700/30 p-2 shadow-[0_45px_140px_rgba(0,0,0,0.55)]">
+              {/* <div className="space-y-4">
                 {heroStats.map((stat) => (
                   <div
                     key={`finale-${stat.label}`}
@@ -761,11 +850,25 @@ export default function PageMain() {
                     </div>
                   </div>
                 ))}
+              </div> */}
+              <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/30">
+                <div
+                  className="relative w-full"
+                  style={{ aspectRatio: "16 / 16" }}
+                >
+                  <Image
+                    src="/images/sorteio-ganhador.png"
+                    alt="Mock da animação final do SorteZapp"
+                    fill
+                    sizes="(min-width: 1024px) 480px, 100vw"
+                    className="object-cover"
+                  />
+                </div>
               </div>
-              <div className="mt-6 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm text-emerald-100">
+              {/* <div className="mt-6 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm text-emerald-100">
                 Conteúdo pronto para viralizar, com gráficos, números e todos os
                 elementos visuais que reforçam a confiança do sorteio.
-              </div>
+              </div> */}
             </div>
           </div>
         </section>

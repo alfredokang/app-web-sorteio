@@ -59,7 +59,7 @@ export function AuthTemplate({
 
         <div className="mt-8 text-center text-sm text-white/60">{footer}</div>
         <div className="mt-15 text-center">
-          <span className="text-white/70 font-semibold">
+          <span className="text-white/70 font-semibold block">
             Aumente suas vendas com sorteios automáticos. Chama no Zapp!
           </span>
           <WhatsAppCta

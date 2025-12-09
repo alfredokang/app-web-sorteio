@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { ReactNode } from "react";
 
+import { WhatsAppCta } from "@/components/WhatsAppCta";
+
 interface AuthTemplateProps {
   title: string;
   subtitle: string;
@@ -60,9 +62,12 @@ export function AuthTemplate({
           <span className="text-white/70 font-semibold">
             Aumente suas vendas com sorteios automáticos. Chama no Zapp!
           </span>
-          <span className="block mt-1 text-emerald-300 underline font-semibold">
-            <Link href="#">Saiba Mais</Link>
-          </span>
+          <WhatsAppCta
+            trackingId="header-desktop"
+            className="rounded-full bg-emerald-400 px-5 py-2 text-sm font-semibold text-emerald-950 transition hover:scale-105 hover:bg-emerald-300 mt-3 inline-flex"
+          >
+            Fale com a gente
+          </WhatsAppCta>
         </div>
       </div>
     </div>

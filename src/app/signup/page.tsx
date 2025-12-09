@@ -132,7 +132,7 @@ export default function SignUpPage() {
   return (
     <AuthTemplate
       title="Crie seu acesso exclusivo"
-      subtitle="Preencha os dados para liberar o painel do time e acompanhar os resultados em tempo real."
+      subtitle="Preencha os dados para liberar o painel do time e acompanhar os resultados em tempo real. Cadastro apenas a clientes autorizados."
       footer={
         <p>
           Já tem uma conta?{" "}

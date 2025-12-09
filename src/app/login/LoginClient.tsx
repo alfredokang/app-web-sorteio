@@ -98,7 +98,7 @@ export default function LoginPage() {
   return (
     <AuthTemplate
       title="Faça login para continuar"
-      subtitle="Acesse a área interna da equipe e acompanhe os próximos sorteios e relatórios."
+      subtitle="Acesse a área interna da equipe e acompanhe os próximos sorteios e relatórios. Acesso apenas a clientes autorizados."
       footer={
         <p>
           Ainda não tem uma conta?{" "}
